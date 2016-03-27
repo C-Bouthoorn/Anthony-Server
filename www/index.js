@@ -36,11 +36,15 @@
       socket = io.connect();
 
       socket.on( 'connect', () => {
-        status("Connected to the server!");
+        status('Connected to the server!');
+      });
+
+      socket.on( 'disconnect', () => {
+        status('Lost connection!', true);
       });
 
       $('#password').keyup( (event) => {
-        if ( event.keyCode == 13 ) {
+        if ( event.keyCode == 13 ) {  // Enter
           $('#btn').click();
         }
       });
