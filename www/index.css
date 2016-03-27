@@ -1,25 +1,30 @@
 @charset "UTF-8";
+/* line 26, index.scss */
 html {
   background-color: #333;
   color: #f9f;
   font-family: "Open Sans", sans-serif;
   font-weight: 400; }
 
+/* line 33, index.scss */
 body {
   padding-left: 25%;
-  padding-top: 10%;
+  padding-top: 1%;
   width: 50%; }
 
+/* line 39, index.scss */
 .status {
   color: #fff;
   font-weight: 300;
   padding-left: 20px;
   transition: color .1s; }
 
+/* line 47, index.scss */
 .error {
   color: #f00;
   font-weight: 600; }
 
+/* line 52, index.scss */
 input {
   background-color: #fff;
   border: 0;
@@ -28,42 +33,68 @@ input {
   font-family: "Open Sans", sans-serif;
   padding: 2px 5px;
   transition: background-color .3s; }
+  /* line 64, index.scss */
   input:focus {
     background-color: #cff; }
+  /* line 68, index.scss */
   input[type=button] {
     border-radius: 5px; }
+    /* line 71, index.scss */
     input[type=button]:hover {
       background-color: #dff; }
+    /* line 75, index.scss */
     input[type=button]:focus {
       background-color: #bff; }
 
+/* line 81, index.scss */
 a {
   color: #9f9;
   text-decoration: none;
   transition: color .3s, text-decoration .3s; }
+  /* line 87, index.scss */
   a:hover {
     color: #9ff;
     text-decoration: underline; }
 
+/* line 94, index.scss */
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0; }
 
+/* line 100, index.scss */
 nav {
   margin: 0;
   padding: 0; }
+  /* line 104, index.scss */
   nav ul {
     list-style: none;
     margin: 0;
     padding: 0 0 10px 10px; }
+    /* line 111, index.scss */
     nav ul li::before {
       content: '×';
       padding-right: 10px; }
 
+/* line 120, index.scss */
 table {
   border-collapse: separate; }
+  /* line 125, index.scss */
   table tr td:first-child {
     font-weight: 600;
     padding-right: 20px; }
+
+/* line 133, index.scss */
+.chatbox {
+  background-color: #fff;
+  height: 300px;
+  margin: 0;
+  padding: 10px;
+  width: 100%; }
+
+/* line 144, index.scss */
+.msgbox {
+  margin: 0;
+  padding: 0;
+  width: 100%; }
 
 /*# sourceMappingURL=index.css.map */

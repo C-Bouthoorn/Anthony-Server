@@ -15,6 +15,8 @@ $link-hover-text-color: #9ff;
 $button-hover-background-color: #dff;
 $button-focus-background-color: #bff;
 
+$chatbox-background-color: #fff;
+
 $font: 'Open Sans', sans-serif;
 
 $light: 300;
@@ -30,7 +32,7 @@ html {
 
 body {
   padding-left: 25%;
-  padding-top: 10%;
+  padding-top: 1%;
   width: 50%;
 }
 
@@ -126,4 +128,22 @@ table {
       }
     }
   }
+}
+
+.chatbox {
+  background-color: $chatbox-background-color;
+
+  height: 300px;
+
+  margin: 0;
+  padding: 10px;
+
+  width: 100%;
+}
+
+.msgbox {
+  margin: 0;
+  padding: 0;
+
+  width: 100%;
 }

@@ -2,9 +2,11 @@
 /*jshint jquery: true*///;
 /*globals io:false, console:false *///;
 'use strict';
-var init, login, register, safe, setstatus, socket;
+var init, initchat, login, register, safe, sessionid, setstatus, socket;
 
 socket = null;
+
+sessionid = null;
 
 setstatus = function(stat, subscr, iserror) {
   var elem, html;
@@ -39,6 +41,9 @@ init = function() {
     socket.on('connect', function() {
       return setstatus('Connected to the server!');
     });
+    socket.on('setid', function(data) {
+      return sessionid = data.sessionid;
+    });
     socket.on('disconnect', function() {
       return setstatus('Lost connection!', true);
     });
@@ -50,13 +55,35 @@ init = function() {
   });
 };
 
+initchat = function() {
+  $('body').append("<h2>Chat</h2>\n<div class=\"chatbox\" id=\"chatbox\"></div><br>\n<input type=\"text\" class=\"msgbox\" id=\"msgbox\">\n<br>");
+  $('#msgbox').keyup(function(event) {
+    var message;
+    if (event.keyCode === 13) {
+      message = $('#msgbox').val();
+      $('#msgbox').val('');
+      return socket.emit('client-send-message', {
+        sessionid: sessionid,
+        message: message
+      });
+    }
+  });
+  return socket.on('client-receive-message', function(data) {
+    var message, user;
+    user = data.user;
+    message = data.message;
+    return $('#chatbox').append("<span class='user'>" + user + "</span>: <span class='message'>" + message + "</span><br>");
+  });
+};
+
 login = function() {
   return safe(function() {
     var pass, user;
     user = $('#username').val();
     pass = $('#password').val();
     socket.on('login-complete', function(data) {
-      return setstatus("Welcome " + user + "!", "Psst: " + data.secret);
+      setstatus("Welcome " + user + "!");
+      return initchat();
     });
     socket.on('login-failed', function(data) {
       return setstatus('Failed to login:', data.error, true);

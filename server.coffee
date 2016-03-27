@@ -7,6 +7,15 @@ io       = require('socket.io')(http)
 mysql    = require('mysql')
 password = require('password-hash-and-salt')
 
+Base64 = {
+  encode: (x) ->
+    new Buffer(x).toString('base64')
+
+  decode: (x) ->
+    new Buffer(x, 'base64').toString('utf8')
+}
+
+
 PORT = 3000
 
 # Connect to database
@@ -60,6 +69,17 @@ FILES.redir.map (file, dest) ->
     res.sendFile WWW_ROOT + dest
 
 
+sockets = []
+sessions = {}
+
+sendMessage = (user, message) ->
+  for s in sockets
+    s.emit 'client-receive-message', {
+      user: user
+      message: message
+    }
+
+
 # Set up sockets
 io.sockets.on 'connection', (socket) ->
   ip = socket.client.conn.remoteAddress
@@ -72,7 +92,10 @@ io.sockets.on 'connection', (socket) ->
   if ip == "127.0.0.1"
     ip = "localhost"
 
+
   console.log "Client connected from #{ip}"
+  sockets.push socket
+
 
   socket.on 'register', (data) ->
     if data is undefined
@@ -186,16 +209,55 @@ io.sockets.on 'connection', (socket) ->
 
           console.log "User '#{user}' succesfully logged in"
 
-          secret = 'SECRET!'
+          # Set sessionid
+          sessionid = ""
+          while sessionid=="" or sessions[sessionid] isnt undefined
+            sessionid = Base64.encode ('' + Math.random()*1e10)
 
-          socket.emit 'login-complete', {
+          console.log "Created sessionid '#{sessionid}'"
+
+          sessions[sessionid] = {
             user: user
-            secret: secret
           }
+
+          socket.emit 'setid', {
+            sessionid: sessionid
+          }
+
+          socket.emit 'login-complete', { }
+
+          sendMessage 'server', "<span class='user'>#{user}</span> joined us! Yay!"
+
+
+  socket.on 'client-send-message', (data) ->
+    if data is undefined
+      console.log 'No data received'
+      return
+
+    if data.sessionid is undefined
+      console.log 'No session id received'
+      return
+
+    if sessions[data.sessionid] is undefined
+      console.log 'Session ID not found in sessions'
+      return
+
+    user = sessions[data.sessionid].user
+    message = data.message
+
+    if message is undefined
+      console.log 'No message received'
+      return
+
+
+    console.log "Got message '#{message}' from user '#{user}'"
+
+    sendMessage user, message
 
 
   socket.on 'disconnect', ->
     console.log 'Client has disconnected'
+    delete sockets[socket]
 
 
 http.listen PORT, ->
