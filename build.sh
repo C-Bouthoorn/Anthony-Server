@@ -2,16 +2,18 @@
 
 build() {
 	for f in *.coffee; do
-		if [ -e $f ]; then
+		# Check if file exists and is readable
+		if [ -f $f ]; then
 			echo "Building $f"
 			coffee -cb "$f"
 		fi
 	done
 
 	for f in *.scss; do
-		if [ -e $f ]; then
+		# Check if file exists and is readable
+		if [ -f $f ]; then
 			echo "Building $f"
-			sass --update -q "$f"
+			sass --update -flq "$f"
 		fi
 	done
 }
