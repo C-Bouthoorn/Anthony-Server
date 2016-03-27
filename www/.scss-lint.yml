@@ -1,0 +1,9 @@
+linters:
+  IdSelector:
+    enabled: false
+
+  NestingDepth:
+    enabled: false
+
+  SingleLinePerSelector:
+    enabled: false
