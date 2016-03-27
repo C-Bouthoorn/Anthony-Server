@@ -75,7 +75,7 @@ initchat = function() {
       var message, user;
       user = data.user;
       message = data.message;
-      return $('#chatbox').append("<span class='user'>" + user + "</span>: <span class='message'>" + message + "</span><br>");
+      return $('#chatbox').append("<span class='user " + user.type + "'>" + user.name + ": <span class='message'>" + message + "</span></span><br>");
     });
   });
   return socket.emit('get-chat-data', {});

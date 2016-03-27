@@ -7,7 +7,7 @@ io       = require('socket.io')(http)
 mysql    = require('mysql')
 password = require('password-hash-and-salt')
 fs       = require('fs')
-
+util     = require('util')
 
 Base64 = {
   encode: (x) ->
@@ -71,11 +71,22 @@ FILES.redir.map (file, dest) ->
     res.sendFile WWW_ROOT + dest
 
 
-sockets = []
+sockets = {}
 sessions = {}
 
+sessionid_by_socketid = {}
+
+
+SERVER_USER = {
+  name: 'SERVER'
+  type: 'server'
+}
+
+
 sendMessage = (user, message) ->
-  for s in sockets
+  for socketid in Object.keys sockets
+    s = sockets[socketid]
+
     s.emit 'client-receive-message', {
       user: user
       message: message
@@ -84,6 +95,8 @@ sendMessage = (user, message) ->
 
 # Called when a player succesfully logged in
 postlogin = (socket, user) ->
+  socketid = socket.conn.id
+
   # Set sessionid
   sessionid = ""
   while sessionid=="" or sessions[sessionid] isnt undefined
@@ -101,15 +114,18 @@ postlogin = (socket, user) ->
   }
 
   # Add to chat clients
-  sockets.push socket
+  if ! (socketid in sockets)
+    sockets[socketid] = socket
+
+  sessionid_by_socketid[socketid] = sessionid
 
   # Send chatbox data
   socket.on 'get-chat-data', ->
-    console.log ''
-
     fs.readFile "#{WWW_ROOT}/chatbox.html", (err, data) ->
       if err
         data = "<h4 class='error'>Failed to get chatbox data</h4>"
+
+      data = '' + data  # STRING FFS
 
       socket.emit 'chat-data', {
         html: data
@@ -118,7 +134,7 @@ postlogin = (socket, user) ->
   socket.emit 'login-complete', { }
 
   # Send welcoming message
-  sendMessage 'SERVER', "<span class='user'>#{user}</span> joined us! Yay!"
+  sendMessage SERVER_USER, "<span class='user'>#{user}</span> joined us! Yay!"
 
 
 # Set up sockets
@@ -159,7 +175,18 @@ io.sockets.on 'connection', (socket) ->
 
         return
 
+
+      if user.length < 2 or pass.length < 2
+        console.log 'Username or password too short'
+
+        socket.emit 'register-failed', {
+          error: 'Username or password too short'
+        }
+
+        return
+
       console.log "Registration request received for user '#{user}'"
+
 
       qq = "SELECT id FROM #{USER_TABLE} WHERE username = #{db.escape(user)}"
 
@@ -261,7 +288,7 @@ io.sockets.on 'connection', (socket) ->
       return
 
     if sessions[data.sessionid] is undefined
-      console.log 'Session ID not found in sessions'
+      console.log "Session ID '#{data.sessionid}' not found in sessions"
       return
 
     user = sessions[data.sessionid].user
@@ -274,14 +301,24 @@ io.sockets.on 'connection', (socket) ->
 
     console.log "Got message '#{message}' from user '#{user}'"
 
-    sendMessage user, message
+    sendMessage { name: user, type: 'normal' }, message
 
 
   socket.on 'disconnect', ->
-    console.log 'Client has disconnected'
+    socketid = socket.conn.id
+    sessionid = sessionid_by_socketid[socketid]
 
-    if socket in sockets
-      delete sockets[socket]
+    if sessionid isnt undefined
+      user = sessions[sessionid].user
+      console.log "#{user} has disconnected"
+
+      sendMessage SERVER_USER, "#{user} has left us ;-;"
+
+      # delete sessions[sessionid]
+      # delete sessionid_by_socket[socket]
+
+    else
+      console.log "Non-logged-in client '#{socketid}:#{sessionid}' has disconnected"
 
 
 http.listen PORT, ->

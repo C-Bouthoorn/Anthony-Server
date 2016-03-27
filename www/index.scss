@@ -147,3 +147,40 @@ table {
 
   width: 100%;
 }
+
+$user-normal-name-color: #000;
+$user-normal-text-color: #000;
+
+$user-admin-name-color: #f00;
+$user-admin-text-color: #000;
+
+$user-server-name-color: #0f0;
+$user-server-text-color: #0f0;
+
+.user {
+  &.normal {
+    color: $user-normal-name-color;
+
+    .message {
+      color: $user-normal-text-color;
+    }
+  }
+
+  &.admin {
+    color: $user-admin-name-color;
+
+    .message {
+      color: $user-admin-text-color;
+    }
+  }
+
+  &.server {
+    color: $user-server-name-color;
+    font-weight: $bold;
+
+    .message {
+      color: $user-server-text-color;
+      font-weight: $bold;
+    }
+  }
+}

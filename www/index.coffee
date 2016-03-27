@@ -70,7 +70,7 @@ initchat = ->
       user = data.user
       message = data.message
 
-      $('#chatbox').append "<span class='user'>#{user}</span>: <span class='message'>#{message}</span><br>"
+      $('#chatbox').append "<span class='user #{user.type}'>#{user.name}: <span class='message'>#{message}</span></span><br>"
 
   socket.emit 'get-chat-data', {}
 
