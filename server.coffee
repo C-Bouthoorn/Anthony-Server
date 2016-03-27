@@ -6,6 +6,8 @@ http     = require('http').Server(app)
 io       = require('socket.io')(http)
 mysql    = require('mysql')
 password = require('password-hash-and-salt')
+fs       = require('fs')
+
 
 Base64 = {
   encode: (x) ->
@@ -80,6 +82,45 @@ sendMessage = (user, message) ->
     }
 
 
+# Called when a player succesfully logged in
+postlogin = (socket, user) ->
+  # Set sessionid
+  sessionid = ""
+  while sessionid=="" or sessions[sessionid] isnt undefined
+    sessionid = Base64.encode "#{Math.random() * 1e10}"
+
+  console.log "Created sessionid '#{sessionid}'"
+
+  sessions[sessionid] = {
+    user: user
+  }
+
+  # Send session id
+  socket.emit 'setid', {
+    sessionid: sessionid
+  }
+
+  # Add to chat clients
+  sockets.push socket
+
+  # Send chatbox data
+  socket.on 'get-chat-data', ->
+    console.log ''
+
+    fs.readFile "#{WWW_ROOT}/chatbox.html", (err, data) ->
+      if err
+        data = "<h4 class='error'>Failed to get chatbox data</h4>"
+
+      socket.emit 'chat-data', {
+        html: data
+      }
+
+  socket.emit 'login-complete', { }
+
+  # Send welcoming message
+  sendMessage 'SERVER', "<span class='user'>#{user}</span> joined us! Yay!"
+
+
 # Set up sockets
 io.sockets.on 'connection', (socket) ->
   ip = socket.client.conn.remoteAddress
@@ -94,8 +135,6 @@ io.sockets.on 'connection', (socket) ->
 
 
   console.log "Client connected from #{ip}"
-  sockets.push socket
-
 
   socket.on 'register', (data) ->
     if data is undefined
@@ -209,24 +248,7 @@ io.sockets.on 'connection', (socket) ->
 
           console.log "User '#{user}' succesfully logged in"
 
-          # Set sessionid
-          sessionid = ""
-          while sessionid=="" or sessions[sessionid] isnt undefined
-            sessionid = Base64.encode ('' + Math.random()*1e10)
-
-          console.log "Created sessionid '#{sessionid}'"
-
-          sessions[sessionid] = {
-            user: user
-          }
-
-          socket.emit 'setid', {
-            sessionid: sessionid
-          }
-
-          socket.emit 'login-complete', { }
-
-          sendMessage 'server', "<span class='user'>#{user}</span> joined us! Yay!"
+          postlogin socket, user
 
 
   socket.on 'client-send-message', (data) ->
@@ -257,7 +279,9 @@ io.sockets.on 'connection', (socket) ->
 
   socket.on 'disconnect', ->
     console.log 'Client has disconnected'
-    delete sockets[socket]
+
+    if socket in sockets
+      delete sockets[socket]
 
 
 http.listen PORT, ->

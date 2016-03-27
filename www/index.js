@@ -56,24 +56,29 @@ init = function() {
 };
 
 initchat = function() {
-  $('body').append("<h2>Chat</h2>\n<div class=\"chatbox\" id=\"chatbox\"></div><br>\n<input type=\"text\" class=\"msgbox\" id=\"msgbox\">\n<br>");
-  $('#msgbox').keyup(function(event) {
-    var message;
-    if (event.keyCode === 13) {
-      message = $('#msgbox').val();
-      $('#msgbox').val('');
-      return socket.emit('client-send-message', {
-        sessionid: sessionid,
-        message: message
-      });
-    }
+  socket.on('chat-data', function(data) {
+    var html;
+    html = data.html;
+    $('body').html(html);
+    $('#msgbox').keyup(function(event) {
+      var message;
+      if (event.keyCode === 13) {
+        message = $('#msgbox').val();
+        $('#msgbox').val('');
+        return socket.emit('client-send-message', {
+          sessionid: sessionid,
+          message: message
+        });
+      }
+    });
+    return socket.on('client-receive-message', function(data) {
+      var message, user;
+      user = data.user;
+      message = data.message;
+      return $('#chatbox').append("<span class='user'>" + user + "</span>: <span class='message'>" + message + "</span><br>");
+    });
   });
-  return socket.on('client-receive-message', function(data) {
-    var message, user;
-    user = data.user;
-    message = data.message;
-    return $('#chatbox').append("<span class='user'>" + user + "</span>: <span class='message'>" + message + "</span><br>");
-  });
+  return socket.emit('get-chat-data', {});
 };
 
 login = function() {

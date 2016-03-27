@@ -51,29 +51,28 @@ init = ->
 
 
 initchat = ->
-  $('body').append """
-    <h2>Chat</h2>
-    <div class="chatbox" id="chatbox"></div><br>
-    <input type="text" class="msgbox" id="msgbox">
-    <br>
-  """
+  socket.on 'chat-data', (data) ->
+    html = data.html
 
-  $('#msgbox').keyup (event) ->
-    if event.keyCode == 13  # Enter
-      message = $('#msgbox').val()
-      $('#msgbox').val('')
+    $('body').html html
 
-      socket.emit 'client-send-message', {
-        sessionid: sessionid
-        message: message
-      }
+    $('#msgbox').keyup (event) ->
+      if event.keyCode == 13  # Enter
+        message = $('#msgbox').val()
+        $('#msgbox').val('')
 
-  socket.on 'client-receive-message', (data) ->
-    user = data.user
-    message = data.message
+        socket.emit 'client-send-message', {
+          sessionid: sessionid
+          message: message
+        }
 
-    $('#chatbox').append "<span class='user'>#{user}</span>: <span class='message'>#{message}</span><br>"
+    socket.on 'client-receive-message', (data) ->
+      user = data.user
+      message = data.message
 
+      $('#chatbox').append "<span class='user'>#{user}</span>: <span class='message'>#{message}</span><br>"
+
+  socket.emit 'get-chat-data', {}
 
 
 login = ->
