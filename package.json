@@ -1,0 +1,26 @@
+{
+  "name": "anthonyserver",
+  "version": "1.2.3",
+  "description": "A server for Anthony",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "C-Bouthoorn",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.13.4",
+    "mysql": "^2.10.2",
+    "password-hash-and-salt": "^0.1.3",
+    "socket.io": "^1.4.5"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/C-Bouthoorn/Anthony-Server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/C-Bouthoorn/Anthony-Server/issues"
+  },
+  "homepage": "https://github.com/C-Bouthoorn/Anthony-Server#readme"
+}
