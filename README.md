@@ -6,6 +6,11 @@ A server for Anthony
 
   Run `npm install`
 
-## HOW TO RUN
+## HOW TO RUN SERVER
 
   Run `npm start`
+
+## HOW TO BUILD CLIENT
+
+  Run `npm build` (without output)  
+  Run `./build.sh` (with output)

@@ -1,5 +1,8 @@
 #!/bin/bash
 
 cd www
-coffee -cb index.coffee
+for f in *.coffee; do
+	echo "Building $f"
+	coffee -cb "$f"
+done
 cd ..
