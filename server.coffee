@@ -134,7 +134,7 @@ postlogin = (socket, user) ->
   socket.emit 'login-complete', { }
 
   # Send welcoming message
-  sendMessage SERVER_USER, "<span class='user'>#{user}</span> joined us! Yay!"
+  sendMessage SERVER_USER, "<span class='user'>#{user}</span> joined the game."
 
 
 # Set up sockets
@@ -260,11 +260,11 @@ io.sockets.on 'connection', (socket) ->
         hash = data[0].password
 
         # Verify the hash
-        password( pass ).verifyAgainst hash, (err, succes) ->
+        password( pass ).verifyAgainst hash, (err, verified) ->
           if err
             throw err
 
-          if ! succes
+          if ! verified
             console.log "User '#{user}' failed to login - hashes don't match"
 
             socket.emit 'login-failed', {
@@ -312,7 +312,7 @@ io.sockets.on 'connection', (socket) ->
       user = sessions[sessionid].user
       console.log "#{user} has disconnected"
 
-      sendMessage SERVER_USER, "#{user} has left us ;-;"
+      sendMessage SERVER_USER, "#{user} left the game."
 
       # delete sessions[sessionid]
       # delete sessionid_by_socket[socket]
