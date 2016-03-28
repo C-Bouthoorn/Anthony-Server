@@ -42,7 +42,7 @@ db = mysql.createConnection {
   database: 'chat_dev'
 }
 
-USER_TABLE = 'users_dev'
+USER_TABLE = 'users'
 
 db.connect()
 
