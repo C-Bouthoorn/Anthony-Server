@@ -17,7 +17,7 @@ $button-focus-background-color: #bff;
 
 $chatbox-background-color: #fff;
 
-$font: 'Open Sans', sans-serif;
+$font: 'Georgia', serif;
 
 $light: 300;
 $normal: 400;
@@ -145,14 +145,15 @@ table {
   width: 100%;
 }
 
-$user-normal-name-color: #000;
-$user-normal-text-color: #000;
+$default-name-color: #000;
+$default-text-color: #000;
 
-$user-admin-name-color: #f00;
-$user-admin-text-color: #000;
+$user-admin-name-color: #fff;
+$user-admin-text-color: #fff;
+$user-admin-background-color: #000;
 
-$user-server-name-color: #0f0;
-$user-server-text-color: #0f0;
+$user-server-name-color: #000;
+$user-server-background-color: #F0E68C;
 
 .chatcontainer {
   height: 100%;
@@ -166,31 +167,32 @@ $chat-message-border-color: #000;
 
 .chat-message {
   border: 1px solid $chat-message-border-color;
+  color: $default-text-color;
   margin: 1px 0;
   padding: 0 3px;
 
   &.normal {
-    color: $user-normal-text-color;
-
     .user {
-      color: $user-normal-name-color;
+      color: $default-name-color;
     }
   }
 
   &.admin {
+    background-color: $user-admin-background-color;
     color: $user-admin-text-color;
 
     .user {
       color: $user-admin-name-color;
+      font-weight: $bold;
     }
   }
 
   &.server {
+    background-color: $user-server-background-color;
     color: $user-server-text-color;
-    font-weight: $bold;
 
     .user {
-      color: $user-server-name-color;
+      font-weight: $bold;
     }
   }
 }

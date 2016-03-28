@@ -1,133 +1,83 @@
-@charset "UTF-8";
-/* line 26, index.scss */
-html {
-  background-color: #333;
-  color: #f9f;
-  font-family: "Open Sans", sans-serif;
-  font-weight: 400; }
+/*
+Error: Undefined variable: "$user-server-text-color".
+        on line 192 of index.scss
 
-/* line 33, index.scss */
-body {
-  padding-left: 25%;
-  padding-top: 1%;
-  width: 50%; }
+187:     }
+188:   }
+189: 
+190:   &.server {
+191:     background-color: $user-server-background-color;
+192:     color: $user-server-text-color;
+193: 
+194:     .user {
+195:       font-weight: $bold;
+196:     }
+197:   }
 
-/* line 39, index.scss */
-.status {
-  color: #fff;
-  font-weight: 300;
-  padding-left: 20px;
-  transition: color .1s; }
-
-/* line 47, index.scss */
-.error {
-  color: #f00;
-  font-weight: 600; }
-
-/* line 52, index.scss */
-input {
-  background-color: #fff;
-  border: 0;
-  border-radius: 2px;
-  color: #000;
-  font-family: "Open Sans", sans-serif;
-  padding: 2px 5px;
-  transition: background-color .3s; }
-  /* line 64, index.scss */
-  input:focus {
-    background-color: #cff; }
-  /* line 68, index.scss */
-  input[type=button] {
-    border-radius: 5px; }
-    /* line 71, index.scss */
-    input[type=button]:hover {
-      background-color: #dff; }
-    /* line 75, index.scss */
-    input[type=button]:focus {
-      background-color: #bff; }
-
-/* line 81, index.scss */
-a {
-  color: #9f9;
-  text-decoration: none;
-  transition: color .3s, text-decoration .3s; }
-  /* line 87, index.scss */
-  a:hover {
-    color: #9ff;
-    text-decoration: underline; }
-
-/* line 94, index.scss */
-h1, h2, h3, h4, h5, h6 {
-  margin: 0;
-  padding: 0; }
-
-/* line 100, index.scss */
-nav {
-  margin: 0;
-  padding: 0; }
-  /* line 104, index.scss */
-  nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0 0 10px 10px; }
-    /* line 111, index.scss */
-    nav ul li::before {
-      content: '×';
-      padding-right: 10px; }
-
-/* line 120, index.scss */
-table {
-  border-collapse: separate; }
-  /* line 125, index.scss */
-  table tr td:first-child {
-    font-weight: 600;
-    padding-right: 20px; }
-
-/* line 133, index.scss */
-.chatbox {
-  background-color: #fff;
-  height: 70%;
-  margin: 0;
-  overflow: auto;
-  width: inherit; }
-
-/* line 141, index.scss */
-.msgbox {
-  margin: 0;
-  padding: 0;
-  width: 100%; }
-
-/* line 157, index.scss */
-.chatcontainer {
-  height: 100%;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 400px; }
-
-/* line 167, index.scss */
-.chat-message {
-  border: 1px solid #000;
-  margin: 1px 0;
-  padding: 0 3px; }
-  /* line 172, index.scss */
-  .chat-message.normal {
-    color: #000; }
-    /* line 175, index.scss */
-    .chat-message.normal .user {
-      color: #000; }
-  /* line 180, index.scss */
-  .chat-message.admin {
-    color: #000; }
-    /* line 183, index.scss */
-    .chat-message.admin .user {
-      color: #f00; }
-  /* line 188, index.scss */
-  .chat-message.server {
-    color: #0f0;
-    font-weight: 600; }
-    /* line 192, index.scss */
-    .chat-message.server .user {
-      color: #0f0; }
-
-/*# sourceMappingURL=index.css.map */
+Backtrace:
+index.scss:192
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/script/tree/variable.rb:49:in `_perform'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/script/tree/node.rb:50:in `perform'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:395:in `visit_prop'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/base.rb:36:in `visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:158:in `block in visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/stack.rb:79:in `block in with_base'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/stack.rb:115:in `with_frame'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/stack.rb:79:in `with_base'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:158:in `visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:431:in `block (2 levels) in visit_rule'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:431:in `map'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:431:in `block in visit_rule'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:179:in `with_environment'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:429:in `visit_rule'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/base.rb:36:in `visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:158:in `block in visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/stack.rb:79:in `block in with_base'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/stack.rb:115:in `with_frame'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/stack.rb:79:in `with_base'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:158:in `visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:431:in `block (2 levels) in visit_rule'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:431:in `map'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:431:in `block in visit_rule'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:179:in `with_environment'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:429:in `visit_rule'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/base.rb:36:in `visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:158:in `block in visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/stack.rb:79:in `block in with_base'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/stack.rb:115:in `with_frame'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/stack.rb:79:in `with_base'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:158:in `visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/base.rb:52:in `block in visit_children'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/base.rb:52:in `map'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/base.rb:52:in `visit_children'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:167:in `block in visit_children'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:179:in `with_environment'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:166:in `visit_children'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/base.rb:36:in `block in visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:186:in `visit_root'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/base.rb:36:in `visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:157:in `visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/visitors/perform.rb:8:in `visit'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/root_node.rb:36:in `css_tree'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/tree/root_node.rb:29:in `render_with_sourcemap'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/engine.rb:378:in `_render_with_sourcemap'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/engine.rb:296:in `block in render_with_sourcemap'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/util.rb:506:in `silence_sass_warnings'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/engine.rb:296:in `render_with_sourcemap'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/plugin/compiler.rb:490:in `update_stylesheet'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/plugin/compiler.rb:209:in `each'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/plugin/compiler.rb:209:in `update_stylesheets'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/plugin.rb:82:in `update_stylesheets'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/exec/sass_scss.rb:363:in `watch_or_update'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/exec/sass_scss.rb:51:in `process_result'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/exec/base.rb:52:in `parse'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/lib/sass/exec/base.rb:19:in `parse!'
+/var/lib/gems/2.1.0/gems/sass-3.4.21/bin/sass:13:in `<top (required)>'
+/usr/local/bin/sass:23:in `load'
+/usr/local/bin/sass:23:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Error: Undefined variable: \"$user-server-text-color\".\A         on line 192 of index.scss\A \A 187:     }\A 188:   }\A 189: \A 190:   &.server {\A 191:     background-color: $user-server-background-color;\A 192:     color: $user-server-text-color;\A 193: \A 194:     .user {\A 195:       font-weight: $bold;\A 196:     }\A 197:   }"; }
