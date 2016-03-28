@@ -98,7 +98,7 @@ SERVER_USER = {
 
 
 htmlEncode = (x) ->
-  HTML.encode x
+  HTML.encode(x).replace /\n/g, '<br>'
 
 
 sendMessage = (user, message) ->
@@ -160,8 +160,13 @@ postlogin = (socket, user) ->
 
 # Called when a message is received
 receiveMessage = (socket, user, message) ->
-  if message.length > 0
-    console.log "Got message '#{message}' from user '#{user.name}'"
+  message = message.trim()
+
+  if message.length < 1
+    return
+
+  console.log "Got message '#{message}' from user '#{user.name}'"
+
 
   if message.startsWith '/'
     firstspace = message.search /\s|$/
@@ -174,7 +179,7 @@ receiveMessage = (socket, user, message) ->
     }
 
   else
-    sendMessage user, HTML.encode message
+    sendMessage user, htmlEncode message
 
 
 # Set up sockets
@@ -219,7 +224,7 @@ io.sockets.on 'connection', (socket) ->
 
       regex = /^[a-zA-Z0-9_]{2,64}$/
 
-      unless (regex.test username) and (regex.test password)
+      unless (regex.test username) and (password.length >= 4)
         console.log "Username or password doesn't match requirements!"
 
         socket.emit 'register-failed', {
@@ -281,7 +286,7 @@ io.sockets.on 'connection', (socket) ->
 
         return
 
-      regex = /^[a-zA-Z0-9_\-]{2,64}$/
+      regex = /^[a-zA-Z0-9_]{2,64}$/
 
       unless (regex.test username) and (password.length >= 4)
         console.log "Username or password doesn't match requirements!"

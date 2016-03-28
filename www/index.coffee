@@ -79,8 +79,7 @@ initchat = ->
 
     socket.on 'disconnect', ->
       msgbox = $('#msgbox')
-      msgbox.prop 'disabled', true
-      msgbox.css 'background-color', '#333'
+      msgbox.hide()
 
       if $('#refreshlink')[0] is undefined
         msgbox.parent().append """
@@ -95,7 +94,7 @@ initchat = ->
         $('#refreshlink a').hide()
 
     $('#msgbox').keyup (event) ->
-      if event.keyCode is 13  # Enter
+      if event.keyCode is 13 and not event.shiftKey # Enter
         message = $('#msgbox').val()
         $('#msgbox').val('')
 

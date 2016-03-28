@@ -87,46 +87,55 @@ table {
 .chatbox {
   background-color: #fff;
   font-family: 'Georgia', serif;
-  height: 70%;
+  height: calc(70% - 2px);
+  border: 1px solid #000;
   margin: 0;
   overflow: auto;
   width: inherit; }
 
-/* line 142, index.scss */
+/* line 143, index.scss */
 .msgbox {
+  font-family: 'Georgia', serif;
+  background-color: #fff;
+  color: #000;
+  width: calc(100% - 6px);
+  height: calc(30% - 4px);
+  border: 1px solid #000;
   margin: 0;
-  padding: 0;
-  width: 100%; }
+  padding: 2px; }
 
-/* line 160, index.scss */
+/* line 166, index.scss */
 .chatcontainer {
-  height: 100%;
   position: absolute;
   right: 0;
   top: 0;
-  width: 400px; }
+  width: 250px;
+  height: calc(100% - 4px);
+  border: 2px solid #000; }
 
-/* line 170, index.scss */
+/* line 178, index.scss */
 .chat-message {
-  border: 1px solid #000;
   color: #000;
+  border: 1px solid #000;
   margin: 0 0 1px;
-  padding: 0 3px; }
-  /* line 177, index.scss */
+  padding: 0 3px;
+  word-break: break-all; }
+  /* line 188, index.scss */
   .chat-message.normal .user {
     color: #000; }
-  /* line 182, index.scss */
+  /* line 193, index.scss */
   .chat-message.admin {
     background-color: #000;
     color: #fff; }
-    /* line 186, index.scss */
+    /* line 197, index.scss */
     .chat-message.admin .user {
       color: #fff;
       font-weight: 600; }
-  /* line 192, index.scss */
+  /* line 203, index.scss */
   .chat-message.server {
-    background-color: #f0e68c; }
-    /* line 195, index.scss */
+    background-color: #f0e68c;
+    border: 1px solid #008800; }
+    /* line 207, index.scss */
     .chat-message.server .user {
       font-weight: 600; }
 

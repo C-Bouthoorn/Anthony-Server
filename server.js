@@ -49,7 +49,7 @@ db = mysql.createConnection({
   database: 'chat_dev'
 });
 
-USER_TABLE = 'users_dev';
+USER_TABLE = 'users';
 
 db.connect();
 
@@ -102,7 +102,8 @@ SERVER_USER = {
 };
 
 htmlEncode = function(x) {
-  return HTML.encode(x);
+  x.replace(/\n/g, '\\n');
+  return HTML.encode(x).replace(/\\n/g, '<br>');
 };
 
 sendMessage = function(user, message) {
@@ -155,13 +156,15 @@ postlogin = function(socket, user) {
 
 receiveMessage = function(socket, user, message) {
   var args, command, firstspace;
-  if (message.length > 0) {
-    console.log("Got message '" + message + "' from user '" + user.name + "'");
+  message = message.trim();
+  if (message.length < 1) {
+    return;
   }
+  console.log("Got message '" + message + "' from user '" + user.name + "'");
   if (message.startsWith('/')) {
     firstspace = message.search(/\s|$/);
     command = message.substring(1, firstspace);
-    args = message.substring(firstspace).split(' ');
+    args = message.substring(firstspace + 1).split(' ');
     return socket.emit('client-receive-message', {
       user: SERVER_USER,
       message: "You issued a command '" + command + "' with arguments '" + (args.join(',')) + "'"
