@@ -18,6 +18,7 @@ $button-focus-background-color: #bff;
 $chatbox-background-color: #fff;
 
 $font: 'Open Sans', sans-serif;
+$chatfont: 'Tahoma', 'Geneva', sans-serif;
 
 $light: 300;
 $normal: 400;
@@ -132,7 +133,7 @@ table {
 
 .chatbox {
   background-color: $chatbox-background-color;
-  font-family: 'Georgia', serif;
+  font-family: $chatfont;
   height: calc(70% - 2px);
   border: 1px solid #000;
   margin: 0;
@@ -141,7 +142,7 @@ table {
 }
 
 .msgbox {
-  font-family: 'Georgia', serif;
+  font-family: $chatfont;
   background-color: #fff;
   color: #000;
   
