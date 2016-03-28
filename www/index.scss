@@ -136,9 +136,11 @@ table {
   height: 300px;
 
   margin: 0;
-  padding: 10px;
+  padding: 0;
 
   width: 100%;
+  
+  overflow: auto;
 }
 
 .msgbox {
