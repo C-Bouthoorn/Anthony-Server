@@ -132,13 +132,10 @@ table {
 
 .chatbox {
   background-color: $chatbox-background-color;
-
-  height: 300px;
-
+  height: 70%;
   margin: 0;
-  padding: 10px;
-
-  width: 100%;
+  overflow: auto;
+  width: inherit;
 }
 
 .msgbox {
@@ -157,8 +154,21 @@ $user-admin-text-color: #000;
 $user-server-name-color: #0f0;
 $user-server-text-color: #0f0;
 
+.chatcontainer {
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 400px;
+}
+
+$chat-message-border-color: #000;
 
 .chat-message {
+  border: 1px solid $chat-message-border-color;
+  margin: 1px 0;
+  padding: 0 3px;
+
   &.normal {
     color: $user-normal-text-color;
 

@@ -182,9 +182,9 @@ io.sockets.on 'connection', (socket) ->
         return
 
 
-      regex = /[a-zA-Z0-9_]{2,64}/
+      regex = /^[a-zA-Z0-9_]{2,64}$/
 
-      unless regex.test username and regex.test password
+      unless (regex.test username) and (regex.test password)
         console.log "Username or password doesn't match requirements!"
 
         socket.emit 'register-failed', {
@@ -242,6 +242,17 @@ io.sockets.on 'connection', (socket) ->
 
         socket.emit 'login-failed', {
           error: "Username or password undefined"
+        }
+
+        return
+
+      regex = /^[a-zA-Z0-9_]{2,64}$/
+
+      unless (regex.test username) and (regex.test password)
+        console.log "Username or password doesn't match requirements!"
+
+        socket.emit 'login-failed', {
+          error: "Username or password doesn't match requirements!"
         }
 
         return

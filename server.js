@@ -167,8 +167,8 @@ io.sockets.on('connection', function(socket) {
         });
         return;
       }
-      regex = /[a-zA-Z0-9_]{2,64}/;
-      if (!regex.test(username && regex.test(password))) {
+      regex = /^[a-zA-Z0-9_]{2,64}$/;
+      if (!((regex.test(username)) && (regex.test(password)))) {
         console.log("Username or password doesn't match requirements!");
         socket.emit('register-failed', {
           error: "Username or password doesn't match requirements!"
@@ -210,13 +210,21 @@ io.sockets.on('connection', function(socket) {
       return;
     }
     return (function(data) {
-      var password, qq, username;
+      var password, qq, regex, username;
       username = data.username;
       password = data.password;
       if (username === void 0 || password === void 0) {
         console.log("Username or password undefined!");
         socket.emit('login-failed', {
           error: "Username or password undefined"
+        });
+        return;
+      }
+      regex = /^[a-zA-Z0-9_]{2,64}$/;
+      if (!((regex.test(username)) && (regex.test(password)))) {
+        console.log("Username or password doesn't match requirements!");
+        socket.emit('login-failed', {
+          error: "Username or password doesn't match requirements!"
         });
         return;
       }
