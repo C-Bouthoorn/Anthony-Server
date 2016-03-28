@@ -102,12 +102,6 @@ htmlEncode = (x) ->
 
 
 sendMessage = (user, message) ->
-  if message.length < 1
-    return
-
-  unless user is SERVER_USER
-    message = htmlEncode message
-
   for socketid in Object.keys sockets
     s = sockets[socketid]
 
@@ -162,6 +156,25 @@ postlogin = (socket, user) ->
       sendMessage SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> joined the game."
 
   socket.emit 'login-complete', { }
+
+
+# Called when a message is received
+receiveMessage = (socket, user, message) ->
+  if message.length > 0
+    console.log "Got message '#{message}' from user '#{user.name}'"
+
+  if message.startsWith '/'
+    firstspace = message.search /\s|$/
+    command = message.substring 1, firstspace
+    args = message.substring(firstspace+1).split ' '
+
+    socket.emit 'client-receive-message', {
+      user: SERVER_USER
+      message: "You issued a command '#{command}' with arguments '#{args.join ','}'"
+    }
+
+  else
+    sendMessage user, HTML.encode message
 
 
 # Set up sockets
@@ -358,10 +371,7 @@ io.sockets.on 'connection', (socket) ->
       console.log "Session ID #{data.sessionid} exists, but no user is associated with it?"
       return
 
-
-    console.log "Got message '#{message}' from user '#{user.name}'"
-
-    sendMessage user, message
+    receiveMessage socket, user, message
 
 
   socket.on 'disconnect', ->
@@ -391,4 +401,5 @@ cmdline = readline.createInterface {
 }
 
 cmdline.on 'line', (message) ->
-  sendMessage SERVER_USER, message
+  if message.length > 0
+    sendMessage SERVER_USER, message

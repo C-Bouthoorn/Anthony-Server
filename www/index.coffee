@@ -68,10 +68,31 @@ init = ->
 
 
 initchat = ->
+  socket.on 'disconnect', ->
+    unless $('#msgbox')?
+      alert 'Disconnected from server!'
+
   socket.on 'chat-data', (data) ->
     html = data.html
 
     $('body').html html
+
+    socket.on 'disconnect', ->
+      msgbox = $('#msgbox')
+      msgbox.prop 'disabled', true
+      msgbox.css 'background-color', '#333'
+
+      if $('#refreshlink')[0] is undefined
+        msgbox.parent().append """
+          <span id="refreshlink" class="error">Lost connection
+          <a href style="display: none;" onclick="location.href=location.href"> Try refreshing?</a></span>
+        """
+
+      socket.on 'connect', ->
+        $('#refreshlink a').show()
+
+      socket.on 'disconnect', ->
+        $('#refreshlink a').hide()
 
     $('#msgbox').keyup (event) ->
       if event.keyCode is 13  # Enter

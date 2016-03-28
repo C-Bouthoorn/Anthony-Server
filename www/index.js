@@ -69,10 +69,30 @@ init = function() {
 };
 
 initchat = function() {
+  socket.on('disconnect', function() {
+    if ($('#msgbox') == null) {
+      return alert('Disconnected from server!');
+    }
+  });
   socket.on('chat-data', function(data) {
     var html;
     html = data.html;
     $('body').html(html);
+    socket.on('disconnect', function() {
+      var msgbox;
+      msgbox = $('#msgbox');
+      msgbox.prop('disabled', true);
+      msgbox.css('background-color', '#333');
+      if ($('#refreshlink')[0] === void 0) {
+        msgbox.parent().append("<span id=\"refreshlink\" class=\"error\">Lost connection\n<a href style=\"display: none;\" onclick=\"location.href=location.href\"> Try refreshing?</a></span>");
+      }
+      socket.on('connect', function() {
+        return $('#refreshlink a').show();
+      });
+      return socket.on('disconnect', function() {
+        return $('#refreshlink a').hide();
+      });
+    });
     $('#msgbox').keyup(function(event) {
       var message;
       if (event.keyCode === 13) {
