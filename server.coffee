@@ -64,8 +64,10 @@ FILES = {
     '/index.html'
     '/login.html'
     '/register.html'
+  ]
 
-    '/emojione/svg/1f603.svg'  # Dynamic!!
+  recursive: [
+    '/images'
   ]
 
   redir: {
@@ -81,6 +83,15 @@ WWW_ROOT = "#{ __dirname }/www"
 FILES.root.map (file) ->
   app.get file, (req, res) ->
     res.sendFile WWW_ROOT + file
+
+FILES.recursive.map (folder) ->
+  fs.readdir "#{WWW_ROOT+folder}", (err, files) ->
+    if err
+      throw err
+
+    files.map (file) ->
+      app.get "#{WWW_ROOT+folder}/#{file}", (req, res) ->
+        res.sendFile "#{WWW_ROOT+folder}/#{file}"
 
 FILES.redir.map (file, dest) ->
   app.get file, (req, res) ->
