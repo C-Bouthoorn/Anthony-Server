@@ -136,9 +136,8 @@ table {
   height: 300px;
   width: 100%;
   
-  margin: 1px 0;
-  padding: 0 3px;
-  
+  margin: 0;
+  padding: 0;
   border: 1px solid #000;
   
   overflow: auto;
@@ -164,6 +163,9 @@ $user-server-background-color: #F0E68C;
 
 .chat-message {
   color: $default-text-color;
+  margin: 1px 0;
+  padding: 0 3px;
+  border: 1px solid #000;
   
   &.normal {
     
