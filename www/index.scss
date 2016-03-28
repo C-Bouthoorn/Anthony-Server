@@ -17,7 +17,7 @@ $button-focus-background-color: #bff;
 
 $chatbox-background-color: #fff;
 
-$font: 'Georgia', serif;
+$font: 'Open Sans', sans-serif;
 
 $light: 300;
 $normal: 400;
@@ -132,6 +132,7 @@ table {
 
 .chatbox {
   background-color: $chatbox-background-color;
+  font-family: 'Georgia', serif;
   height: 70%;
   margin: 0;
   overflow: auto;
@@ -153,7 +154,8 @@ $user-admin-text-color: #fff;
 $user-admin-background-color: #000;
 
 $user-server-name-color: #000;
-$user-server-background-color: #F0E68C;
+$user-server-background-color: #f0e68c;
+
 
 .chatcontainer {
   height: 100%;
@@ -168,7 +170,7 @@ $chat-message-border-color: #000;
 .chat-message {
   border: 1px solid $chat-message-border-color;
   color: $default-text-color;
-  margin: 1px 0;
+  margin: 0 0 1px;
   padding: 0 3px;
 
   &.normal {
@@ -189,7 +191,6 @@ $chat-message-border-color: #000;
 
   &.server {
     background-color: $user-server-background-color;
-    color: $user-server-text-color;
 
     .user {
       font-weight: $bold;

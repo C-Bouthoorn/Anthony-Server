@@ -3,13 +3,17 @@
 'use strict'
 
 # Load modules
-app      = require('express')()
-http     = require('http').Server(app)
-io       = require('socket.io')(http)
-mysql    = require('mysql')
-salthash = require('password-hash-and-salt')
-fs       = require('fs')
-util     = require('util')
+app        = require('express')()
+http       = require('http').Server(app)
+io         = require('socket.io')(http)
+fs         = require('fs')
+util       = require('util')
+mysql      = require('mysql')
+readline   = require('readline')
+htmlencode = require('htmlencode')
+salthash   = require('password-hash-and-salt')
+
+
 
 Base64 = {
   encode: (x) ->
@@ -17,6 +21,14 @@ Base64 = {
 
   decode: (x) ->
     new Buffer(x, 'base64').toString 'utf8'
+}
+
+HTML = {
+  encode: (x) ->
+    htmlencode.htmlEncode x
+
+  decode: (x) ->
+    htmlencode.htmlDecode x
 }
 
 
@@ -85,11 +97,21 @@ SERVER_USER = {
 }
 
 
+htmlEncode = (x) ->
+  HTML.encode x
+
+
 sendMessage = (user, message) ->
+  if message.length < 1
+    return
+
+  unless user is SERVER_USER
+    message = htmlEncode message
+
   for socketid in Object.keys sockets
     s = sockets[socketid]
 
-    console.log "Send message to socket ID '#{socketid}' (user '#{sessions[sessionid_by_socketid[socketid]].user.name}')!"
+    # console.log "Send message to socket ID '#{socketid}' (user '#{sessions[sessionid_by_socketid[socketid]].user.name}')!"
 
     s.emit 'client-receive-message', {
       user: user
@@ -246,9 +268,9 @@ io.sockets.on 'connection', (socket) ->
 
         return
 
-      regex = /^[a-zA-Z0-9_]{2,64}$/
+      regex = /^[a-zA-Z0-9_\-]{2,64}$/
 
-      unless (regex.test username) and (regex.test password)
+      unless (regex.test username) and (password.length >= 4)
         console.log "Username or password doesn't match requirements!"
 
         socket.emit 'login-failed', {
@@ -361,3 +383,12 @@ io.sockets.on 'connection', (socket) ->
 
 http.listen PORT, ->
   console.log "Server started on port #{PORT}!"
+
+# Read messages from stdin
+cmdline = readline.createInterface {
+  input: process.stdin
+  output: process.stdout
+}
+
+cmdline.on 'line', (message) ->
+  sendMessage SERVER_USER, message

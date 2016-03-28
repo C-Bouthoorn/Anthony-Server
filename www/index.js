@@ -47,10 +47,23 @@ init = function() {
     socket.on('disconnect', function() {
       return setstatus('Lost connection!', true);
     });
-    return $('#password').keyup(function(event) {
+    $('#password').keyup(function(event) {
       if (event.keyCode === 13) {
         return $('#btn').click();
       }
+    });
+    socket.on('login-complete', function(data) {
+      setstatus("Welcome " + username + "!", 'Loading chat...');
+      return initchat();
+    });
+    socket.on('login-failed', function(data) {
+      return setstatus('Failed to login:', data.error, true);
+    });
+    socket.on('register-complete', function(data) {
+      return setstatus("Welcome to our server, " + username + " !");
+    });
+    return socket.on('register-failed', function(data) {
+      return setstatus('Failed to register', data.error, true);
     });
   });
 };
@@ -75,7 +88,12 @@ initchat = function() {
       var message, user;
       user = data.user;
       message = data.message;
-      return $('#chatbox').html(("<p class='chat-message " + user.type + "'><span class='user'>" + user.name + ":</span> " + message + "</p>") + $('#chatbox').html());
+      html = "<p class='chat-message " + user.type + "'>";
+      if (user.name !== "SERVER") {
+        html += "<span class='user'>" + user.name + ": </span>";
+      }
+      html += message + "</p>";
+      return $('#chatbox').html(html + $('#chatbox').html());
     });
   });
   return socket.emit('get-chat-data', {});
@@ -86,13 +104,6 @@ login = function() {
     var password, username;
     username = $('#username').val();
     password = $('#password').val();
-    socket.on('login-complete', function(data) {
-      setstatus("Welcome " + username + "!", 'Loading chat...');
-      return initchat();
-    });
-    socket.on('login-failed', function(data) {
-      return setstatus('Failed to login:', data.error, true);
-    });
     return socket.emit('login', {
       username: username,
       password: password
@@ -105,12 +116,6 @@ register = function() {
     var password, username;
     username = $('#username').val();
     password = $('#password').val();
-    socket.on('register-complete', function(data) {
-      return setstatus("Welcome to our server, " + username + " !");
-    });
-    socket.on('register-failed', function(data) {
-      return setstatus('Failed to register', data.error, true);
-    });
     return socket.emit('register', {
       username: username,
       password: password

@@ -50,6 +50,23 @@ init = ->
         $('#btn').click()
 
 
+    # Login
+    socket.on 'login-complete', (data) ->
+      setstatus "Welcome #{username}!", 'Loading chat...'
+      initchat()
+
+    socket.on 'login-failed', (data) ->
+      setstatus 'Failed to login:', data.error, true
+
+    # Register
+    socket.on 'register-complete', (data) ->
+      setstatus "Welcome to our server, #{username} !"
+
+    socket.on 'register-failed', (data) ->
+      setstatus 'Failed to register', data.error, true
+
+
+
 initchat = ->
   socket.on 'chat-data', (data) ->
     html = data.html
@@ -57,7 +74,7 @@ initchat = ->
     $('body').html html
 
     $('#msgbox').keyup (event) ->
-      if event.keyCode == 13  # Enter
+      if event.keyCode is 13  # Enter
         message = $('#msgbox').val()
         $('#msgbox').val('')
 
@@ -70,7 +87,14 @@ initchat = ->
       user = data.user
       message = data.message
 
-      $('#chatbox').html "<p class='chat-message #{user.type}'><span class='user'>#{user.name}:</span> #{message}</p>" + $('#chatbox').html()
+      html = "<p class='chat-message #{user.type}'>"
+
+      unless user.name is "SERVER"
+        html += "<span class='user'>#{user.name}: </span>"
+
+      html += "#{message}</p>"
+
+      $('#chatbox').html html + $('#chatbox').html()
 
   socket.emit 'get-chat-data', {}
 
@@ -79,13 +103,6 @@ login = ->
   safe ->
     username = $('#username').val()
     password = $('#password').val()
-
-    socket.on 'login-complete', (data) ->
-      setstatus "Welcome #{username}!", 'Loading chat...'
-      initchat()
-
-    socket.on 'login-failed', (data) ->
-      setstatus 'Failed to login:', data.error, true
 
     socket.emit 'login', {
       username: username
@@ -97,12 +114,6 @@ register = ->
   safe ->
     username = $('#username').val()
     password = $('#password').val()
-
-    socket.on 'register-complete', (data) ->
-      setstatus "Welcome to our server, #{username} !"
-
-    socket.on 'register-failed', (data) ->
-      setstatus 'Failed to register', data.error, true
 
     socket.emit 'register', {
       username: username
