@@ -24,11 +24,11 @@ Base64 = {
 }
 
 HTML = {
-  encode: (x) ->
-    htmlencode.htmlEncode x
+  encode: (x, y) ->
+    htmlencode.htmlEncode x, y
 
-  decode: (x) ->
-    htmlencode.htmlDecode x
+  decode: (x, y) ->
+    htmlencode.htmlDecode x, y
 }
 
 
@@ -64,6 +64,8 @@ FILES = {
     '/index.html'
     '/login.html'
     '/register.html'
+
+    '/emojione/svg/1f603.svg'  # Dynamic!!
   ]
 
   redir: {
@@ -97,8 +99,14 @@ SERVER_USER = {
 }
 
 
-htmlEncode = (x) ->
-  HTML.encode(x).replace /\n/g, '<br>'
+parseMessage = (x) ->
+  html = HTML.encode(x, true).replace /&#10;/g, '<br>'
+
+  console.log html
+
+  html = html.replace /:\)/g, '<img src="http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg">'
+
+  return html
 
 
 sendMessage = (user, message) ->
@@ -179,7 +187,7 @@ receiveMessage = (socket, user, message) ->
     }
 
   else
-    sendMessage user, htmlEncode message
+    sendMessage user, parseMessage message
 
 
 # Set up sockets
