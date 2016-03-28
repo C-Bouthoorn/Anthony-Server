@@ -157,30 +157,30 @@ $user-admin-text-color: #000;
 $user-server-name-color: #0f0;
 $user-server-text-color: #0f0;
 
-.user {
-  &.normal {
-    color: $user-normal-name-color;
 
-    .message {
-      color: $user-normal-text-color;
+.chat-message {
+  &.normal {
+    color: $user-normal-text-color;
+
+    .user {
+      color: $user-normal-name-color;
     }
   }
 
   &.admin {
-    color: $user-admin-name-color;
+    color: $user-admin-text-color;
 
-    .message {
-      color: $user-admin-text-color;
+    .user {
+      color: $user-admin-name-color;
     }
   }
 
   &.server {
-    color: $user-server-name-color;
+    color: $user-server-text-color;
     font-weight: $bold;
 
-    .message {
-      color: $user-server-text-color;
-      font-weight: $bold;
+    .user {
+      color: $user-server-name-color;
     }
   }
 }

@@ -97,25 +97,24 @@ table {
   padding: 0;
   width: 100%; }
 
-/* line 161, index.scss */
-.user.normal {
+/* line 162, index.scss */
+.chat-message.normal {
   color: #000; }
-  /* line 164, index.scss */
-  .user.normal .message {
+  /* line 165, index.scss */
+  .chat-message.normal .user {
     color: #000; }
-/* line 169, index.scss */
-.user.admin {
-  color: #f00; }
-  /* line 172, index.scss */
-  .user.admin .message {
-    color: #000; }
-/* line 177, index.scss */
-.user.server {
+/* line 170, index.scss */
+.chat-message.admin {
+  color: #000; }
+  /* line 173, index.scss */
+  .chat-message.admin .user {
+    color: #f00; }
+/* line 178, index.scss */
+.chat-message.server {
   color: #0f0;
   font-weight: 600; }
-  /* line 181, index.scss */
-  .user.server .message {
-    color: #0f0;
-    font-weight: 600; }
+  /* line 182, index.scss */
+  .chat-message.server .user {
+    color: #0f0; }
 
 /*# sourceMappingURL=index.css.map */

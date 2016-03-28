@@ -1,20 +1,22 @@
-'use strict';
+`/*jshint node: true*///`
+
+'use strict'
 
 # Load modules
 app      = require('express')()
 http     = require('http').Server(app)
 io       = require('socket.io')(http)
 mysql    = require('mysql')
-password = require('password-hash-and-salt')
+salthash = require('password-hash-and-salt')
 fs       = require('fs')
 util     = require('util')
 
 Base64 = {
   encode: (x) ->
-    new Buffer(x).toString('base64')
+    new Buffer(x).toString 'base64'
 
   decode: (x) ->
-    new Buffer(x, 'base64').toString('utf8')
+    new Buffer(x, 'base64').toString 'utf8'
 }
 
 
@@ -44,23 +46,23 @@ Object.prototype.map = (callback) ->
 # Set paths for files
 FILES = {
   root: [
-    '/index.html'
     '/index.js'
     '/index.css'
 
+    '/index.html'
     '/login.html'
     '/register.html'
   ]
 
   redir: {
-    '/': '/index.html'
-    '/login': '/login.html'
-    '/register': '/register.html'
+    '/':          '/index.html'
+    '/login':     '/login.html'
+    '/register':  '/register.html'
   }
 }
 
 
-WWW_ROOT = __dirname + '/www'
+WWW_ROOT = "#{ __dirname }/www"
 
 FILES.root.map (file) ->
   app.get file, (req, res) ->
@@ -87,6 +89,8 @@ sendMessage = (user, message) ->
   for socketid in Object.keys sockets
     s = sockets[socketid]
 
+    console.log "Send message to socket ID '#{socketid}' (user '#{sessions[sessionid_by_socketid[socketid]].user.name}')!"
+
     s.emit 'client-receive-message', {
       user: user
       message: message
@@ -98,11 +102,11 @@ postlogin = (socket, user) ->
   socketid = socket.conn.id
 
   # Set sessionid
-  sessionid = ""
-  while sessionid=="" or sessions[sessionid] isnt undefined
+  sessionid = ''
+  while sessionid=='' or sessions[sessionid] isnt undefined
     sessionid = Base64.encode "#{Math.random() * 1e10}"
 
-  console.log "Created sessionid '#{sessionid}'"
+  console.log "Created sessionid '#{sessionid}' for user '#{user.name}'"
 
   sessions[sessionid] = {
     user: user
@@ -125,21 +129,23 @@ postlogin = (socket, user) ->
       if err
         data = "<h4 class='error'>Failed to get chatbox data</h4>"
 
-      data = '' + data  # STRING FFS
+      # Convert to string
+      data = '' + data
 
       socket.emit 'chat-data', {
         html: data
       }
 
-  socket.emit 'login-complete', { }
+      # Send welcoming message
+      sendMessage SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> joined the game."
 
-  # Send welcoming message
-  sendMessage SERVER_USER, "<span class='user'>#{user}</span> joined the game."
+  socket.emit 'login-complete', { }
 
 
 # Set up sockets
 io.sockets.on 'connection', (socket) ->
   ip = socket.client.conn.remoteAddress
+  socketid = socket.conn.id
 
   # IPv4
   if ip.startsWith "::ffff:"
@@ -149,110 +155,110 @@ io.sockets.on 'connection', (socket) ->
   if ip == "127.0.0.1"
     ip = "localhost"
 
+  console.log "Client connected from '#{ip}' with socket ID '#{socketid}'"
 
-  console.log "Client connected from #{ip}"
 
   socket.on 'register', (data) ->
     if data is undefined
-      console.log 'No data received'
+      console.log "No data received"
 
       socket.emit 'register-failed', {
-        error: 'No data received'
+        error: "No data received"
       }
 
       return
 
     do (data=data) ->
-      user = data.user
-      pass = data.pass
+      username = data.username
+      password = data.password
 
-      if user is undefined or pass is undefined
-        console.log 'Username or password undefined!'
+      if username is undefined or password is undefined
+        console.log "Username or password undefined"
 
         socket.emit 'register-failed', {
-          error: 'Username or password undefined'
+          error: "Username or password undefined"
         }
 
         return
 
 
-      if user.length < 2 or pass.length < 2
-        console.log 'Username or password too short'
+      regex = /[a-zA-Z0-9_]{2,64}/
+
+      unless regex.test username and regex.test password
+        console.log "Username or password doesn't match requirements!"
 
         socket.emit 'register-failed', {
-          error: 'Username or password too short'
+          error: "Username or password doesn't match requirements!"
         }
 
         return
 
-      console.log "Registration request received for user '#{user}'"
+      console.log "Registration request received for user '#{username}'"
 
 
-      qq = "SELECT id FROM #{USER_TABLE} WHERE username = #{db.escape(user)}"
+      qq = "SELECT id FROM #{USER_TABLE} WHERE username = #{db.escape(username)}"
 
       db.query qq, (err, data) ->
         if data.length > 0
-          console.log "User '#{user}' already exists"
+          console.log "User '#{username}' already exists"
 
           socket.emit 'register-failed', {
-            error: 'Username already exists'
+            error: "Username already exists"
           }
 
           return
 
-        password( pass ).hash (err, hash) ->
+        salthash( password ).hash (err, hash) ->
           if err
             throw err
 
-          qq = "INSERT INTO #{USER_TABLE} (username, password) VALUES (#{db.escape(user)}, #{db.escape(hash)})"
+          qq = "INSERT INTO #{USER_TABLE} (username, password) VALUES (#{db.escape(username)}, #{db.escape(hash)})"
 
           db.query qq, (err, data) ->
             if err
               throw err
 
-            console.log "Registration for user '#{user}' done"
+            console.log "Registration for user '#{username}' done"
 
-            socket.emit 'register-complete', {
-              user: user
-            }
+            socket.emit 'register-complete', { }
 
 
   socket.on 'login', (data) ->
     if data is undefined
-      console.log 'No data received'
+      console.log "No data received"
 
       socket.emit 'login-failed', {
-        error: 'No data received'
+        error: "No data received"
       }
 
       return
 
     do (data=data) ->
-      user = data.user
-      pass = data.pass
+      username = data.username
+      password = data.password
 
-      if user is undefined or pass is undefined
-        console.log 'Username and/or password undefined!'
+      if username is undefined or password is undefined
+        console.log "Username or password undefined!"
 
         socket.emit 'login-failed', {
-          error: 'Username or password undefined'
+          error: "Username or password undefined"
         }
 
         return
 
-      console.log "Login request received for user '#{user}'"
+      console.log "Login request received for user '#{username}'"
 
-      qq = "SELECT password FROM #{USER_TABLE} WHERE username = #{db.escape(user)}"
+      qq = "SELECT password, channel_perms, type FROM #{USER_TABLE} WHERE username = #{db.escape(username)}"
 
       db.query qq, (err, data) ->
         if err
           throw err
 
         if data.length < 1
-          console.log "User '#{user}' not found"
+          console.log "User '#{username}' not found"
 
           socket.emit 'login-failed', {
-            error: 'Username or password incorrect!'
+            error: "Username or password incorrect!"
           }
 
           return
@@ -260,48 +266,69 @@ io.sockets.on 'connection', (socket) ->
         hash = data[0].password
 
         # Verify the hash
-        password( pass ).verifyAgainst hash, (err, verified) ->
+        salthash( password ).verifyAgainst hash, (err, verified) ->
           if err
             throw err
 
-          if ! verified
-            console.log "User '#{user}' failed to login - hashes don't match"
+          unless verified
+            console.log "User '#{username}' failed to login - hashes don't match"
 
             socket.emit 'login-failed', {
-              error: 'Username or password incorrect!'
+              error: "Username or password incorrect!"
             }
 
             return
 
-          console.log "User '#{user}' succesfully logged in"
+          console.log "User '#{username}' succesfully logged in"
 
-          postlogin socket, user
+          # Get user permissions and type
+          channel_perms = data[0].channel_perms
+          usertype = data[0].type
+
+          # No need to check, as it's from the DB, and we trust the DB (right?)
+
+          # Check type
+          if usertype == ''
+            usertype = 'normal'
+
+          postlogin socket, {
+            name: username
+            channel_perms: channel_perms
+            type: usertype
+          }
 
 
   socket.on 'client-send-message', (data) ->
     if data is undefined
-      console.log 'No data received'
+      console.log "No data received"
       return
 
-    if data.sessionid is undefined
-      console.log 'No session id received'
-      return
-
-    if sessions[data.sessionid] is undefined
-      console.log "Session ID '#{data.sessionid}' not found in sessions"
-      return
-
-    user = sessions[data.sessionid].user
     message = data.message
 
     if message is undefined
-      console.log 'No message received'
+      console.log "No message received"
+      return
+
+    sessionid = data.sessionid
+
+    if sessionid is undefined
+      console.log "No session ID received"
+      return
+
+    if sessions[sessionid] is undefined
+      console.log "Session ID '#{data.sessionid}' not found in sessions"
+      return
+
+    user = sessions[sessionid].user
+
+    if user is undefined
+      console.log "Session ID #{data.sessionid} exists, but no user is associated with it?"
       return
 
 
-    console.log "Got message '#{message}' from user '#{user}'"
+    console.log "Got message '#{message}' from user '#{user.name}'"
 
-    sendMessage { name: user, type: 'normal' }, message
+    sendMessage user, message
 
 
   socket.on 'disconnect', ->
@@ -310,16 +337,16 @@ io.sockets.on 'connection', (socket) ->
 
     if sessionid isnt undefined
       user = sessions[sessionid].user
-      console.log "#{user} has disconnected"
 
-      sendMessage SERVER_USER, "#{user} left the game."
-
-      # delete sessions[sessionid]
-      # delete sessionid_by_socket[socket]
+      console.log "#{user.name} left the game."
+      sendMessage SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> left the game."
 
     else
-      console.log "Non-logged-in client '#{socketid}:#{sessionid}' has disconnected"
+      console.log "Non-logged-in client with socket ID '#{socketid}' has disconnected"
+
+    unless sockets[socketid] is undefined
+      delete sockets[socketid]
 
 
 http.listen PORT, ->
-  console.log "Server started on port #{PORT}"
+  console.log "Server started on port #{PORT}!"

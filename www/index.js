@@ -75,7 +75,7 @@ initchat = function() {
       var message, user;
       user = data.user;
       message = data.message;
-      return $('#chatbox').append("<span class='user " + user.type + "'>" + user.name + ": <span class='message'>" + message + "</span></span><br>");
+      return $('#chatbox').html(("<p class='chat-message " + user.type + "'><span class='user'>" + user.name + ":</span> " + message + "</p>") + $('#chatbox').html());
     });
   });
   return socket.emit('get-chat-data', {});
@@ -83,37 +83,37 @@ initchat = function() {
 
 login = function() {
   return safe(function() {
-    var pass, user;
-    user = $('#username').val();
-    pass = $('#password').val();
+    var password, username;
+    username = $('#username').val();
+    password = $('#password').val();
     socket.on('login-complete', function(data) {
-      setstatus("Welcome " + user + "!");
+      setstatus("Welcome " + username + "!", 'Loading chat...');
       return initchat();
     });
     socket.on('login-failed', function(data) {
       return setstatus('Failed to login:', data.error, true);
     });
     return socket.emit('login', {
-      user: user,
-      pass: pass
+      username: username,
+      password: password
     });
   });
 };
 
 register = function() {
   return safe(function() {
-    var pass, user;
-    user = $('#username').val();
-    pass = $('#password').val();
+    var password, username;
+    username = $('#username').val();
+    password = $('#password').val();
     socket.on('register-complete', function(data) {
-      return setstatus("Welcome to our server, " + user + " !");
+      return setstatus("Welcome to our server, " + username + " !");
     });
     socket.on('register-failed', function(data) {
       return setstatus('Failed to register', data.error, true);
     });
     return socket.emit('register', {
-      user: user,
-      pass: pass
+      username: username,
+      password: password
     });
   });
 };

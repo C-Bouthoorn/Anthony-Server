@@ -70,41 +70,41 @@ initchat = ->
       user = data.user
       message = data.message
 
-      $('#chatbox').append "<span class='user #{user.type}'>#{user.name}: <span class='message'>#{message}</span></span><br>"
+      $('#chatbox').html "<p class='chat-message #{user.type}'><span class='user'>#{user.name}:</span> #{message}</p>" + $('#chatbox').html()
 
   socket.emit 'get-chat-data', {}
 
 
 login = ->
   safe ->
-    user = $('#username').val()
-    pass = $('#password').val()
+    username = $('#username').val()
+    password = $('#password').val()
 
     socket.on 'login-complete', (data) ->
-      setstatus "Welcome #{user}!"
+      setstatus "Welcome #{username}!", 'Loading chat...'
       initchat()
 
     socket.on 'login-failed', (data) ->
       setstatus 'Failed to login:', data.error, true
 
     socket.emit 'login', {
-      user: user,
-      pass: pass
+      username: username
+      password: password
     }
 
 
 register = ->
   safe ->
-    user = $('#username').val()
-    pass = $('#password').val()
+    username = $('#username').val()
+    password = $('#password').val()
 
     socket.on 'register-complete', (data) ->
-      setstatus "Welcome to our server, #{user} !"
+      setstatus "Welcome to our server, #{username} !"
 
     socket.on 'register-failed', (data) ->
       setstatus 'Failed to register', data.error, true
 
     socket.emit 'register', {
-      user: user
-      pass: pass
+      username: username
+      password: password
     }
