@@ -181,6 +181,8 @@ $chat-message-border-color: #000;
   
   margin: 0 0 1px;
   padding: 0 3px;
+  
+  word-break: break-all;
 
   &.normal {
     .user {
