@@ -7,6 +7,26 @@ socket = null
 sessionid = null
 
 
+setSessionCookie = ->
+  if Cookies is undefined
+    return undefined
+
+  if $('#remember').is ':checked'
+    Cookies.set 'sessionid', sessionid
+
+getSessionCookie = ->
+  if Cookies is undefined
+    return undefined
+
+  Cookies.get 'sessionid'
+
+removeSessionCookie = ->
+  if Cookies is undefined
+    return undefined
+
+  Cookies.remove 'sessionid'
+
+
 setstatus = (stat, subscr, iserror) ->
   if typeof subscr isnt 'string'
     iserror = subscr
@@ -36,7 +56,7 @@ escapeRegex = (str) ->
   str.replace /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"
 
 
-parseEmoji = (html) ->
+parseMessage = (html) ->
   emojis = {
     ':)': "http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg"
   }
@@ -45,8 +65,8 @@ parseEmoji = (html) ->
     '20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'eyeroll', 'fabulous',
     'facehoof', 'greed', 'hero', 'laugh', 'lie', 'lyraexcited', 'lyrasad', 'NM2', 'NM3', 'notamused', 'photofinish',
     'ppsmile', 'pwink', 'RDhuh', 'rdsmile', 'rdwink', 'scared', 'science', 'seriousTS', 'shiny', 'shrug',
-    'somethingwentwrong', 'spikemov', 'spike', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile',
-    'twiblush', 'umad', 'vinyl', 'XTUXSmiley', 'YEAH'
+    'somethingwentwrong', 'spikemov', 'spike', 'squee', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile',
+    'twiblush', 'umad', 'vinyl', 'XTUXSmiley', 'yay', 'YEAH'
   ]
 
     emojis[":#{name}:"] = "/images/#{name}.png"
@@ -73,14 +93,16 @@ init = ->
     socket.on 'disconnect', ->
       setstatus 'Lost connection!', true
 
-    $('#password').keyup (event) ->
+    $('body').keyup (event) ->
       if event.keyCode == 13  # Enter
         $('#btn').click()
 
-
     # Login
     socket.on 'login-complete', (data) ->
-      setstatus "Welcome #{username}!", 'Loading chat...'
+      if true or rememberLogin  # Temporary
+        setSessionCookie()
+
+      setstatus "Welcome #{if username then username else data.username}!", 'Loading chat...'
       initchat()
 
     socket.on 'login-failed', (data) ->
@@ -93,58 +115,67 @@ init = ->
     socket.on 'register-failed', (data) ->
       setstatus 'Failed to register', data.error, true
 
+    sessionCookie = getSessionCookie()
+    unless sessionCookie is undefined
+      sessionid = sessionCookie
+
+      socket.emit 'client-cookie-login', {
+        sessionid: sessionid
+      }
+
 
 
 initchat = ->
-  socket.on 'disconnect', ->
-    unless $('#msgbox')?
-      alert 'Disconnected from server!'
-
-  socket.on 'chat-data', (data) ->
-    html = data.html
-
-    $('body').html html
-
+  safe ->
     socket.on 'disconnect', ->
-      msgbox = $('#msgbox')
-      msgbox.hide()
+      unless $('#msgbox')?
+        alert 'Disconnected from server!'
 
-      if $('#refreshlink')[0] is undefined
-        msgbox.parent().append """
-          <span id="refreshlink" class="error">Lost connection
-          <a href style="display: none;" onclick="location.href=location.href"> Try refreshing?</a></span>
-        """
+    socket.on 'chat-data', (data) ->
+      html = data.html
 
-      socket.on 'connect', ->
-        $('#refreshlink a').show()
+      $('body').html html
 
       socket.on 'disconnect', ->
-        $('#refreshlink a').hide()
+        msgbox = $('#msgbox')
+        msgbox.hide()
 
-    $('#msgbox').keyup (event) ->
-      if event.keyCode is 13 and not event.shiftKey # Enter
-        message = $('#msgbox').val()
-        $('#msgbox').val('')
+        if $('#refreshlink')[0] is undefined
+          msgbox.parent().append """
+            <span id="refreshlink" class="error">Lost connection
+            <a href style="display: none;" onclick="location.href=location.href"> Try refreshing?</a></span>
+          """
 
-        socket.emit 'client-send-message', {
-          sessionid: sessionid
-          message: message
-        }
+        socket.on 'connect', ->
+          $('#refreshlink a').show()
 
-    socket.on 'client-receive-message', (data) ->
-      user = data.user
-      message = data.message
+        socket.on 'disconnect', ->
+          $('#refreshlink a').hide()
 
-      html = "<p class='chat-message #{user.type}'>"
+      $('#msgbox').keyup (event) ->
+        if event.keyCode is 13 and not event.shiftKey # Enter
+          message = $('#msgbox').val()
+          $('#msgbox').val('')
 
-      unless user.name is "SERVER"
-        html += "<span class='user'>#{user.name}: </span>"
+          socket.emit 'client-send-message', {
+            sessionid: sessionid
+            message: message
+          }
 
-      html += "#{parseEmoji message}</p>"
+      socket.on 'client-receive-message', (data) ->
+        user = data.user
+        message = data.message
 
-      $('#chatbox').html html + $('#chatbox').html()
+        html = "<p class='chat-message #{user.type}'>"
 
-  socket.emit 'get-chat-data', {}
+        unless user.name is "SERVER"
+          html += "<span class='user'>#{user.name}: </span>"
+
+        html += "#{parseMessage message}</p>"
+
+        $('#chatbox').html html + $('#chatbox').html()
+
+    socket.emit 'get-chat-data', {}
 
 
 login = ->
@@ -167,3 +198,7 @@ register = ->
       username: username
       password: password
     }
+
+logout = ->
+  removeSessionCookie()
+  location.href = location.href

@@ -6,6 +6,7 @@
 
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/js-cookie/js-cookie/master/src/js.cookie.js"></script>
 
     <script type="text/javascript" src="/index.js"></script>
 
@@ -25,14 +26,14 @@
     <table>
       <tr>
         <td>Username</td>
-        <td><input id="username" type="text" maxlength="64" value=""></td>
+        <td><input id="username" type="text"></td>
       </tr>
       <tr>
         <td>Password</td>
-        <td><input id="password" type="password" maxlength="128" value=""></td>
+        <td><input id="password" type="password"></td>
       </tr>
       <tr>
-        <td><input id="btn" type="button" onclick="login()" value="Login!"></td>
+        <td><input id="btn" type="button" onclick="login()" value="Login!"> <input id="remember" type="checkbox" checked></td>
       </tr>
     </table>
     <br>

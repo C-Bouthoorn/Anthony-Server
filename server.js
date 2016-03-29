@@ -138,20 +138,29 @@ sendMessage = function(user, message) {
   return results;
 };
 
-postlogin = function(socket, user) {
+postlogin = function(socket, user, newsession) {
   var sessionid, socketid;
-  socketid = socket.conn.id;
-  sessionid = '';
-  while (sessionid === '' || sessions[sessionid] !== void 0) {
-    sessionid = Base64.encode("" + (Math.random() * 1e10));
+  if (newsession == null) {
+    newsession = true;
   }
-  console.log("Created sessionid '" + sessionid + "' for user '" + user.name + "'");
-  sessions[sessionid] = {
-    user: user
-  };
-  socket.emit('setid', {
-    sessionid: sessionid
-  });
+  socketid = socket.conn.id;
+  if (newsession) {
+    sessionid = '';
+    while (sessionid === '' || sessions[sessionid] !== void 0) {
+      sessionid = Base64.encode("" + (Math.random() * 1e10));
+    }
+    console.log("Created sessionid '" + sessionid + "' for user '" + user.name + "'");
+    sessions[sessionid] = {
+      user: user
+    };
+    socket.emit('setid', {
+      sessionid: sessionid
+    });
+  } else {
+    sessionid = user.sessionid;
+    delete user['sessionid'];
+    console.log("Used sessionid '" + sessionid + "' for user '" + user.name + "'");
+  }
   if (!(indexOf.call(sockets, socketid) >= 0)) {
     sockets[socketid] = socket;
   }
@@ -168,7 +177,9 @@ postlogin = function(socket, user) {
       return sendMessage(SERVER_USER, "<span class='user " + user.type + "'>" + user.name + "</span> joined the game.");
     });
   });
-  return socket.emit('login-complete', {});
+  return socket.emit('login-complete', {
+    username: user.name
+  });
 };
 
 receiveMessage = function(socket, user, message) {
@@ -323,6 +334,35 @@ io.sockets.on('connection', function(socket) {
         });
       });
     })(data);
+  });
+  socket.on('client-cookie-login', function(data) {
+    var sessionid, user;
+    if (data === void 0) {
+      console.log("No data received");
+      socket.emit('login-failed', {
+        error: "No data received"
+      });
+      return;
+    }
+    sessionid = data.sessionid;
+    if (sessionid === void 0) {
+      console.log("No cookie received");
+      socket.emit('login-failed', {
+        error: "Invalid cookie"
+      });
+      return;
+    }
+    if (sessions[sessionid] === void 0) {
+      console.log("Session not found!");
+      socket.emit('login-failed', {
+        error: "Invalid cookie"
+      });
+      return;
+    }
+    user = sessions[sessionid].user;
+    user.sessionid = sessionid;
+    console.log("User '" + user.name + "' logged in with session ID '" + sessionid + "'");
+    return postlogin(socket, user, false);
   });
   socket.on('client-send-message', function(data) {
     var message, sessionid, user;

@@ -2,11 +2,34 @@
 /*jshint jquery: true*///;
 /*globals io:false, console:false *///;
 'use strict';
-var escapeRegex, init, initchat, login, parseEmoji, register, safe, sessionid, setstatus, socket;
+var escapeRegex, getSessionCookie, init, initchat, login, logout, parseMessage, register, removeSessionCookie, safe, sessionid, setSessionCookie, setstatus, socket;
 
 socket = null;
 
 sessionid = null;
+
+setSessionCookie = function() {
+  if (Cookies === void 0) {
+    return void 0;
+  }
+  if ($('#remember').is(':checked')) {
+    return Cookies.set('sessionid', sessionid);
+  }
+};
+
+getSessionCookie = function() {
+  if (Cookies === void 0) {
+    return void 0;
+  }
+  return Cookies.get('sessionid');
+};
+
+removeSessionCookie = function() {
+  if (Cookies === void 0) {
+    return void 0;
+  }
+  return Cookies.remove('sessionid');
+};
 
 setstatus = function(stat, subscr, iserror) {
   var elem, html;
@@ -39,12 +62,12 @@ escapeRegex = function(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 };
 
-parseEmoji = function(html) {
+parseMessage = function(html) {
   var emoji, emojis, i, len, link, name, ref;
   emojis = {
     ':)': "http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg"
   };
-  ref = ['20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'eyeroll', 'fabulous', 'facehoof', 'greed', 'hero', 'laugh', 'lie', 'lyraexcited', 'lyrasad', 'NM2', 'NM3', 'notamused', 'photofinish', 'ppsmile', 'pwink', 'RDhuh', 'rdsmile', 'rdwink', 'scared', 'science', 'seriousTS', 'shiny', 'shrug', 'somethingwentwrong', 'spikemov', 'spike', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile', 'twiblush', 'umad', 'vinyl', 'XTUXSmiley', 'YEAH'];
+  ref = ['20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'eyeroll', 'fabulous', 'facehoof', 'greed', 'hero', 'laugh', 'lie', 'lyraexcited', 'lyrasad', 'NM2', 'NM3', 'notamused', 'photofinish', 'ppsmile', 'pwink', 'RDhuh', 'rdsmile', 'rdwink', 'scared', 'science', 'seriousTS', 'shiny', 'shrug', 'somethingwentwrong', 'spikemov', 'spike', 'squee', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile', 'twiblush', 'umad', 'vinyl', 'XTUXSmiley', 'yay', 'YEAH'];
   for (i = 0, len = ref.length; i < len; i++) {
     name = ref[i];
     emojis[":" + name + ":"] = "/images/" + name + ".png";
@@ -58,6 +81,7 @@ parseEmoji = function(html) {
 
 init = function() {
   return safe(function() {
+    var sessionCookie;
     socket = io.connect();
     socket.on('connect', function() {
       return setstatus('Connected to the server!');
@@ -68,13 +92,16 @@ init = function() {
     socket.on('disconnect', function() {
       return setstatus('Lost connection!', true);
     });
-    $('#password').keyup(function(event) {
+    $('body').keyup(function(event) {
       if (event.keyCode === 13) {
         return $('#btn').click();
       }
     });
     socket.on('login-complete', function(data) {
-      setstatus("Welcome " + username + "!", 'Loading chat...');
+      if (true || rememberLogin) {
+        setSessionCookie();
+      }
+      setstatus("Welcome " + (username ? username : data.username) + "!", 'Loading chat...');
       return initchat();
     });
     socket.on('login-failed', function(data) {
@@ -83,60 +110,69 @@ init = function() {
     socket.on('register-complete', function(data) {
       return setstatus("Welcome to our server, " + username + " !");
     });
-    return socket.on('register-failed', function(data) {
+    socket.on('register-failed', function(data) {
       return setstatus('Failed to register', data.error, true);
     });
+    sessionCookie = getSessionCookie();
+    if (sessionCookie !== void 0) {
+      sessionid = sessionCookie;
+      return socket.emit('client-cookie-login', {
+        sessionid: sessionid
+      });
+    }
   });
 };
 
 initchat = function() {
-  socket.on('disconnect', function() {
-    if ($('#msgbox') == null) {
-      return alert('Disconnected from server!');
-    }
-  });
-  socket.on('chat-data', function(data) {
-    var html;
-    html = data.html;
-    $('body').html(html);
+  return safe(function() {
     socket.on('disconnect', function() {
-      var msgbox;
-      msgbox = $('#msgbox');
-      msgbox.hide();
-      if ($('#refreshlink')[0] === void 0) {
-        msgbox.parent().append("<span id=\"refreshlink\" class=\"error\">Lost connection\n<a href style=\"display: none;\" onclick=\"location.href=location.href\"> Try refreshing?</a></span>");
+      if ($('#msgbox') == null) {
+        return alert('Disconnected from server!');
       }
-      socket.on('connect', function() {
-        return $('#refreshlink a').show();
-      });
-      return socket.on('disconnect', function() {
-        return $('#refreshlink a').hide();
-      });
     });
-    $('#msgbox').keyup(function(event) {
-      var message;
-      if (event.keyCode === 13 && !event.shiftKey) {
-        message = $('#msgbox').val();
-        $('#msgbox').val('');
-        return socket.emit('client-send-message', {
-          sessionid: sessionid,
-          message: message
+    socket.on('chat-data', function(data) {
+      var html;
+      html = data.html;
+      $('body').html(html);
+      socket.on('disconnect', function() {
+        var msgbox;
+        msgbox = $('#msgbox');
+        msgbox.hide();
+        if ($('#refreshlink')[0] === void 0) {
+          msgbox.parent().append("<span id=\"refreshlink\" class=\"error\">Lost connection\n<a href style=\"display: none;\" onclick=\"location.href=location.href\"> Try refreshing?</a></span>");
+        }
+        socket.on('connect', function() {
+          return $('#refreshlink a').show();
         });
-      }
+        return socket.on('disconnect', function() {
+          return $('#refreshlink a').hide();
+        });
+      });
+      $('#msgbox').keyup(function(event) {
+        var message;
+        if (event.keyCode === 13 && !event.shiftKey) {
+          message = $('#msgbox').val();
+          $('#msgbox').val('');
+          return socket.emit('client-send-message', {
+            sessionid: sessionid,
+            message: message
+          });
+        }
+      });
+      return socket.on('client-receive-message', function(data) {
+        var message, user;
+        user = data.user;
+        message = data.message;
+        html = "<p class='chat-message " + user.type + "'>";
+        if (user.name !== "SERVER") {
+          html += "<span class='user'>" + user.name + ": </span>";
+        }
+        html += (parseMessage(message)) + "</p>";
+        return $('#chatbox').html(html + $('#chatbox').html());
+      });
     });
-    return socket.on('client-receive-message', function(data) {
-      var message, user;
-      user = data.user;
-      message = data.message;
-      html = "<p class='chat-message " + user.type + "'>";
-      if (user.name !== "SERVER") {
-        html += "<span class='user'>" + user.name + ": </span>";
-      }
-      html += (parseEmoji(message)) + "</p>";
-      return $('#chatbox').html(html + $('#chatbox').html());
-    });
+    return socket.emit('get-chat-data', {});
   });
-  return socket.emit('get-chat-data', {});
 };
 
 login = function() {
@@ -161,4 +197,9 @@ register = function() {
       password: password
     });
   });
+};
+
+logout = function() {
+  removeSessionCookie();
+  return location.href = location.href;
 };

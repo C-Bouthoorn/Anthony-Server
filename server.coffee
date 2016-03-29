@@ -131,24 +131,32 @@ sendMessage = (user, message) ->
 
 
 # Called when a player succesfully logged in
-postlogin = (socket, user) ->
+postlogin = (socket, user, newsession=true) ->
   socketid = socket.conn.id
 
-  # Set sessionid
-  sessionid = ''
-  while sessionid=='' or sessions[sessionid] isnt undefined
-    sessionid = Base64.encode "#{Math.random() * 1e10}"
+  if newsession
+    # Set sessionid
+    sessionid = ''
+    while sessionid=='' or sessions[sessionid] isnt undefined
+      sessionid = Base64.encode "#{Math.random() * 1e10}"
 
-  console.log "Created sessionid '#{sessionid}' for user '#{user.name}'"
+    console.log "Created sessionid '#{sessionid}' for user '#{user.name}'"
 
-  sessions[sessionid] = {
-    user: user
-  }
+    sessions[sessionid] = {
+      user: user
+    }
 
-  # Send session id
-  socket.emit 'setid', {
-    sessionid: sessionid
-  }
+    # Send session id
+    socket.emit 'setid', {
+      sessionid: sessionid
+    }
+
+  else
+    sessionid = user.sessionid
+    delete user['sessionid']
+
+    console.log "Used sessionid '#{sessionid}' for user '#{user.name}'"
+
 
   # Add to chat clients
   if ! (socketid in sockets)
@@ -172,7 +180,9 @@ postlogin = (socket, user) ->
       # Send welcoming message
       sendMessage SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> joined the game."
 
-  socket.emit 'login-complete', { }
+  socket.emit 'login-complete', {
+    username: user.name
+  }
 
 
 # Called when a message is received
@@ -364,6 +374,44 @@ io.sockets.on 'connection', (socket) ->
             channel_perms: channel_perms
             type: usertype
           }
+
+
+  socket.on 'client-cookie-login', (data) ->
+    if data is undefined
+      console.log "No data received"
+
+      socket.emit 'login-failed', {
+        error: "No data received"
+      }
+
+      return
+
+    sessionid = data.sessionid
+
+    if sessionid is undefined
+      console.log "No cookie received"
+
+      socket.emit 'login-failed', {
+        error: "Invalid cookie"
+      }
+
+      return
+
+    if sessions[sessionid] is undefined
+      console.log "Session not found!"
+
+      socket.emit 'login-failed', {
+        error: "Invalid cookie"
+      }
+
+      return
+
+    user = sessions[sessionid].user
+    user.sessionid = sessionid
+
+    console.log "User '#{user.name}' logged in with session ID '#{sessionid}'"
+
+    postlogin socket, user, false
 
 
   socket.on 'client-send-message', (data) ->
