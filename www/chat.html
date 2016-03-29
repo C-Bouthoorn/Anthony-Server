@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Chatroom - Login</title>
+    
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script type="text/javascript" src="/index.js"></script>
+
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body onload="init()">
+    <div class="status" id="connstatus"></div>
+    <div class="loginform">
+      <p>
+        Enter your login data or <a href="/register">register</a>!
+      </p>
+      Username:
+      <p>
+        <input id="username" maxlength="64" value="" type="text">
+      </p>
+      Password:
+      <p>
+        <input id="password" maxlength="128" value="" type="password">
+      </p>
+      <input id="btn" onclick="login()" value="Login" type="button">
+    </div>
+  </body>
+</html>
