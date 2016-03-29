@@ -1,94 +1,136 @@
-$background: #72c4ff;
-$background-image: linear-gradient(to top, #4c8bb8 32%, #72c4ff 90%);
-$text-color: #09c;
-
-$link-text-color: #9f9;
-$link-hover-text-color: #9ff;
-
-$font: 'Tahoma', 'Geneva', sans-serif;
-$font-size: 14;
+$font: 'Open Sans', sans-serif;
+$font-size: 14px;
 
 $normal: 400;
 
-html body{
-  background: $background;
-  background-image: $background-image;;
+html,
+body {
+  height: 100%;
+}
+
+
+$background-color: #72c4ff;
+$background-gradient: #4c8bb8;
+$text-color: #09c;
+
+body {
+  background: $background-color;
+  background-image: linear-gradient(to top, $background-gradient 32%, $background-color 90%);
+
   color: $text-color;
   font-family: $font;
   font-size: $font-size;
   font-weight: $normal;
-  
+
   height: 100%;
-  margin: 0px;
-  padding: 0px;
-  text-align: center;
+  margin: 0;
   overflow: hidden;
+  padding: 0;
+  text-align: center;
 }
 
-.error{
-  background: #dc143c;
-  background: linear-gradient(to bottom, #dc143c, #eeeeee 175px);
-}
+
+$status-background: #0f0;
+$status-background-gradient: #eee;
+$status-text-color: #000;
+
+$error-text-color: #000;
+$error-background-color: #dc143c;
+$error-background-gradient: #eee;
 
 .status {
-  background: #0f0;
-  background: linear-gradient(to bottom, #0f0, #eeeeee 175px);
-  transition: background .2s;
-  
-  color: black;
+  background-color: $status-background;
+  background-image: linear-gradient(to bottom, $status-background, $status-background-gradient 175px);
+
+  border-radius: 0 0 10px 10px;
+
+  color: $status-text-color;
   font-weight: bold;
-  text-decoration: none;
-  
-  width: 400px;
+
   margin: 0 auto 8px;
-  padding: 4px 16px 4px 16px;
-  border-radius: 10px;
+  padding: 4px 16px;
+
+  text-decoration: none;
+  transition: background .2s;
+
+  width: 400px;
+
+  &.error {
+    background-color: $error-background-color;
+    background-image: linear-gradient(to bottom, $error-background-color, $error-background-gradient 175px);
+
+    color: $error-text-color;
+  }
 }
 
-.loginform{
-  background: #eeeeee;
-  background: linear-gradient(to bottom, #cccccc, #eeeeee 175px);
-  
-  position: relative;
-  line-height: 5px;
-  z-index: 20;
-  
+
+$loginform-background-color: #eee;
+$loginform-background-gradient: #ccc;
+$loginform-border-color: #999;
+
+.loginform {
+  background-color: $loginform-background-color;
+  background-image: linear-gradient(to bottom, $loginform-background-gradient, $loginform-background-color 175px);
+
+  border: 1px solid $loginform-border-color;
+  border-radius: 10px;
+
   font-weight: bold;
-  text-decoration: none;
-  
-  width: 300px;
+
+  line-height: 5px;
+
   margin: auto;
   padding: 0 12px;
-  border: 1px solid #999;
-  border-radius: 10px;
+
+  position: relative;
+
+  text-decoration: none;
+
+  width: 300px;
+
+  z-index: 20;
 }
 
+
+$input-background-color: #fff;
+$input-border-color: #999;
+$input-button-text-color: #fff;
+$input-button-background-color: #1ad;
+$input-button-hover-background-color: #bee9f7;
+
 input {
-  background-color: #fff;
-  
-  width: 100%;
-  height: 25px;
+  background-color: $input-background-color;
+
+  border: 1px solid $input-border-color;
   display: block;
+
+  height: 25px;
   padding: 0 2px;
-  border: 1px solid #999;
-  
+
+  width: 100%;
+
   &[type=button] {
-    background-color: #1ad;
-    transition: background-color .3s;
-    color: #fff;
-    
-    height: 30px;
+    background-color: $input-button-background-color;
     border-radius: 15px;
-    
+    color: $input-button-text-color;
+
     cursor: hand;
-    cursor: pointer;
+    // cursor: pointer;
+
+    height: 30px;
+
+    transition: background-color .3s;
 
     &:hover {
-      background-color: #bee9f7;
+      background-color: $input-button-hover-background-color;
       color: $text-color;
     }
   }
 }
+
+
+$link-text-color: #9f9;
+$link-hover-text-color: #9ff;
 
 a {
   color: $link-text-color;
@@ -102,25 +144,59 @@ a {
   }
 }
 
+
+$chatbox-background-color: #fff;
+$chatbox-border-color: #000;
+
 .chatbox {
-  background-color: #fff;
+  background-color: $chatbox-background-color;
+  border: 1px solid $chatbox-border-color;
+
   height: calc(70% - 2px);
-  border: 1px solid #000;
   margin: 0;
+
   overflow: auto;
   width: inherit;
 }
 
+
+$msgbox-background-color: #fff;
+$msgbox-text-color: #000;
+$msgbox-border-color: #000;
+
 .msgbox {
-  background-color: #fff;
-  color: #000;
-  
-  width: calc(100% - 6px);
+  background-color: $msgbox-background-color;
+  border: 1px solid $msgbox-border-color;
+
+  color: $msgbox-text-color;
+
   height: calc(30% - 4px);
-  border: 1px solid #000;
+
   margin: 0;
   padding: 2px;
+
+  width: calc(100% - 6px);
 }
+
+$chatcontainer-border-color: #000;
+
+.chatcontainer {
+  border: 2px solid $chatcontainer-border-color;
+
+  height: calc(100% - 4px);
+
+  position: absolute;
+  right: 0;
+
+  text-align: left;
+
+  top: 0;
+
+  width: 250px;
+}
+
+
+$chatmessage-border-color: #000;
 
 $default-name-color: #000;
 $user-admin-name-color: #fff;
@@ -130,31 +206,21 @@ $user-admin-text-color: #fff;
 
 $user-admin-background-color: #000;
 $user-server-background-color: #f0e68c;
-
-
-.chatcontainer {
-  position: absolute;
-  right: 0;
-  top: 0;
-  
-  width: 250px;
-  height: calc(100% - 4px);
-  border: 2px solid #000;
-}
+$user-server-border-color: #080;
 
 .chat-message {
+  border: 1px solid $chatmessage-border-color;
   color: $default-text-color;
-  border: 1px solid #000;
-  
+
   margin: 0 0 1px;
   padding: 0 2px;
-  
+
   word-wrap: break-word;
-  
+
   .user {
-      color: $default-name-color;
-      font-weight: bold;
-    }
+    color: $default-name-color;
+    font-weight: bold;
+  }
 
   &.admin {
     background-color: $user-admin-background-color;
@@ -167,6 +233,6 @@ $user-server-background-color: #f0e68c;
 
   &.server {
     background-color: $user-server-background-color;
-    border: 1px solid #008800;
+    border: 1px solid $user-server-border-color;
   }
 }

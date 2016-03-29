@@ -1,131 +1,136 @@
-/* line 13, style.scss */
-html body {
+/* line 6, style.scss */
+html,
+body {
+  height: 100%; }
+
+/* line 16, style.scss */
+body {
   background: #72c4ff;
   background-image: linear-gradient(to top, #4c8bb8 32%, #72c4ff 90%);
   color: #09c;
-  font-family: "Tahoma", "Geneva", sans-serif;
-  font-size: 14;
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
   font-weight: 400;
   height: 100%;
-  margin: 0px;
-  padding: 0px;
-  text-align: center;
-  overflow: hidden; }
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  text-align: center; }
 
-/* line 28, style.scss */
-.error {
-  background: #dc143c;
-  background: linear-gradient(to bottom, #dc143c, #eeeeee 175px); }
-
-/* line 33, style.scss */
+/* line 41, style.scss */
 .status {
-  background: #0f0;
-  background: linear-gradient(to bottom, #0f0, #eeeeee 175px);
-  transition: background .2s;
-  color: black;
+  background-color: #0f0;
+  background-image: linear-gradient(to bottom, #0f0, #eee 175px);
+  border-radius: 0 0 10px 10px;
+  color: #000;
   font-weight: bold;
-  text-decoration: none;
-  width: 400px;
   margin: 0 auto 8px;
-  padding: 4px 16px 4px 16px;
-  border-radius: 10px; }
-
-/* line 48, style.scss */
-.loginform {
-  background: #eeeeee;
-  background: linear-gradient(to bottom, #cccccc, #eeeeee 175px);
-  position: relative;
-  line-height: 5px;
-  z-index: 20;
-  font-weight: bold;
+  padding: 4px 16px;
   text-decoration: none;
-  width: 300px;
+  transition: background .2s;
+  width: 400px; }
+  /* line 58, style.scss */
+  .status.error {
+    background-color: #dc143c;
+    background-image: linear-gradient(to bottom, #dc143c, #eee 175px);
+    color: #000; }
+
+/* line 71, style.scss */
+.loginform {
+  background-color: #eee;
+  background-image: linear-gradient(to bottom, #ccc, #eee 175px);
+  border: 1px solid #999;
+  border-radius: 10px;
+  font-weight: bold;
+  line-height: 5px;
   margin: auto;
   padding: 0 12px;
-  border: 1px solid #999;
-  border-radius: 10px; }
+  position: relative;
+  text-decoration: none;
+  width: 300px;
+  z-index: 20; }
 
-/* line 66, style.scss */
+/* line 101, style.scss */
 input {
   background-color: #fff;
-  width: 100%;
-  height: 25px;
+  border: 1px solid #999;
   display: block;
+  height: 25px;
   padding: 0 2px;
-  border: 1px solid #999; }
-  /* line 75, style.scss */
+  width: 100%; }
+  /* line 112, style.scss */
   input[type=button] {
     background-color: #1ad;
-    transition: background-color .3s;
-    color: #fff;
-    height: 30px;
     border-radius: 15px;
+    color: #fff;
     cursor: hand;
-    cursor: pointer; }
-    /* line 86, style.scss */
+    height: 30px;
+    transition: background-color .3s; }
+    /* line 124, style.scss */
     input[type=button]:hover {
       background-color: #bee9f7;
       color: #09c; }
 
-/* line 93, style.scss */
+/* line 135, style.scss */
 a {
   color: #9f9;
   text-decoration: none;
   transition: color .3s, text-decoration .3s; }
-  /* line 99, style.scss */
+  /* line 141, style.scss */
   a:hover {
     color: #9ff;
     text-decoration: underline; }
 
-/* line 105, style.scss */
+/* line 151, style.scss */
 .chatbox {
   background-color: #fff;
-  height: calc(70% - 2px);
   border: 1px solid #000;
+  height: calc(70% - 2px);
   margin: 0;
   overflow: auto;
   width: inherit; }
 
-/* line 114, style.scss */
+/* line 167, style.scss */
 .msgbox {
   background-color: #fff;
-  color: #000;
-  width: calc(100% - 6px);
-  height: calc(30% - 4px);
   border: 1px solid #000;
+  color: #000;
+  height: calc(30% - 4px);
   margin: 0;
-  padding: 2px; }
+  padding: 2px;
+  width: calc(100% - 6px); }
 
-/* line 135, style.scss */
+/* line 183, style.scss */
 .chatcontainer {
+  border: 2px solid #000;
+  height: calc(100% - 4px);
   position: absolute;
   right: 0;
+  text-align: left;
   top: 0;
-  width: 250px;
-  height: calc(100% - 4px);
-  border: 2px solid #000; }
+  width: 250px; }
 
-/* line 145, style.scss */
+/* line 211, style.scss */
 .chat-message {
-  color: #000;
   border: 1px solid #000;
+  color: #000;
   margin: 0 0 1px;
   padding: 0 2px;
   word-wrap: break-word; }
-  /* line 154, style.scss */
+  /* line 220, style.scss */
   .chat-message .user {
     color: #000;
     font-weight: bold; }
-  /* line 159, style.scss */
+  /* line 225, style.scss */
   .chat-message.admin {
     background-color: #000;
     color: #fff; }
-    /* line 163, style.scss */
+    /* line 229, style.scss */
     .chat-message.admin .user {
       color: #fff; }
-  /* line 168, style.scss */
+  /* line 234, style.scss */
   .chat-message.server {
     background-color: #f0e68c;
-    border: 1px solid #008800; }
+    border: 1px solid #080; }
 
 /*# sourceMappingURL=style.css.map */

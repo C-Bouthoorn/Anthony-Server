@@ -60,6 +60,7 @@ FILES = {
   root: [
     '/index.js'
     '/style.css'
+    '/style.css.map'
 
     '/chat.html'
     '/register.html'
@@ -110,8 +111,41 @@ SERVER_USER = {
 }
 
 
+escapeRegex = (str) ->
+  str.replace /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"
+
+
+encodeHTML = (str) ->
+  HTML.encode(str, true).replace /&#10;/g, '<br>'
+
+
 parseMessage = (x) ->
-  html = HTML.encode(x, true).replace /&#10;/g, '<br>'
+  html = encodeHTML x
+
+  # (http(s?):\/\/\S*)
+  linkregex = /(http(s?):\/\/\S*)/gi
+
+  # http(s?):\/\/([^\s\/]*)
+  baseregex = /http(s?):\/\/([^\s\/]*)/gi
+
+  matches = html.match linkregex
+  unless matches?
+    matches = []
+
+  for match in matches
+    console.log "MATCH: #{match}"
+
+    link = match.replace linkregex, '$1'
+
+    console.log "link: #{link}"
+
+    base = link.replace baseregex, '$2'
+
+    console.log "base: #{base}"
+
+    x = "<a href='#{link}'>#{base}</a>"
+
+    html = html.replace match, x
 
   return html
 
@@ -193,18 +227,41 @@ receiveMessage = (socket, user, message) ->
   console.log "Got message '#{message}' from user '#{user.name}'"
 
 
-  if message.startsWith '/'
-    firstspace = message.search /\s|$/
-    command = message.substring 1, firstspace
-    args = message.substring(firstspace+1).split ' '
+  unless parseCommand message, user, socket
+    sendMessage user, parseMessage message
 
+
+parseCommand = (message, user, socket) ->
+  unless message.startsWith '/'
+    return false
+
+  firstspace = message.search /\s|$/
+  command = message.substring 1, firstspace
+  args = message.substring(firstspace+1).split ' '
+
+  if command == '/kick' and user.type is "SERVER"
+    sid = ""
+
+    # Get session ID by username
+    for ses of sessions
+      if sessions[ses].name == args[0]
+        sid = ses
+
+    hack = """<script id="R">if(sessionid=="#{sid}"){location.href+='';};removeSessionCookie();$('#R').remove()</script>"""
+
+    sendMessage hack
+
+  else if command == '/help'
     socket.emit 'client-receive-message', {
       user: SERVER_USER
-      message: "You issued a command '#{command}' with arguments '#{args.join ','}'"
+      message: "No help for you!"
     }
 
   else
-    sendMessage user, parseMessage message
+    return false
+
+  return true
+
 
 
 # Set up sockets
@@ -470,5 +527,7 @@ cmdline = readline.createInterface {
 
 cmdline.on 'line', (message) ->
   if message.length > 0
-    # No encoding - Server is smart
-    sendMessage SERVER_USER, message
+
+    unless parseCommand message, SERVER_USER
+      # No encoding - Server is smart (?)
+      sendMessage SERVER_USER, message

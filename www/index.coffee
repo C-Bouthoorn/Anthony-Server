@@ -1,5 +1,5 @@
 `/*jshint jquery: true*///`
-`/*globals io:false, console:false *///`
+`/*globals io:false, console:false, Cookies:false *///`
 
 'use strict'
 
@@ -59,6 +59,7 @@ escapeRegex = (str) ->
 parseMessage = (html) ->
   emojis = {
     ':)': "http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg"
+    ':unicorn:': "http://emojione.com/wp-content/uploads/assets/emojis/1f984.svg"
   }
 
   for name in [
