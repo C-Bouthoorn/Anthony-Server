@@ -59,10 +59,9 @@ Object.prototype.map = (callback) ->
 FILES = {
   root: [
     '/index.js'
-    '/index.css'
+    '/style.css'
 
-    '/index.html'
-    '/login.html'
+    '/chat.html'
     '/register.html'
   ]
 
@@ -71,9 +70,8 @@ FILES = {
   ]
 
   redir: {
-    '/':          '/index.html'
-    '/login':     '/login.html'
-    '/register':  '/register.html'
+    '/':         '/chat.html'
+    '/register': '/register.html'
   }
 }
 

@@ -1,0 +1,172 @@
+$background: #72c4ff;
+$background-image: linear-gradient(to top, #4c8bb8 32%, #72c4ff 90%);
+$text-color: #09c;
+
+$link-text-color: #9f9;
+$link-hover-text-color: #9ff;
+
+$font: 'Tahoma', 'Geneva', sans-serif;
+$font-size: 14;
+
+$normal: 400;
+
+html body{
+  background: $background;
+  background-image: $background-image;;
+  color: $text-color;
+  font-family: $font;
+  font-size: $font-size;
+  font-weight: $normal;
+  
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.error{
+  background: #dc143c;
+  background: linear-gradient(to bottom, #dc143c, #eeeeee 175px);
+}
+
+.status {
+  background: #0f0;
+  background: linear-gradient(to bottom, #0f0, #eeeeee 175px);
+  transition: background .2s;
+  
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  
+  width: 400px;
+  margin: 0 auto 8px;
+  padding: 4px 16px 4px 16px;
+  border-radius: 10px;
+}
+
+.loginform{
+  background: #eeeeee;
+  background: linear-gradient(to bottom, #cccccc, #eeeeee 175px);
+  
+  position: relative;
+  line-height: 5px;
+  z-index: 20;
+  
+  font-weight: bold;
+  text-decoration: none;
+  
+  width: 300px;
+  margin: auto;
+  padding: 0 12px;
+  border: 1px solid #999;
+  border-radius: 10px;
+}
+
+input {
+  background-color: #fff;
+  
+  width: 100%;
+  height: 25px;
+  display: block;
+  padding: 0 2px;
+  border: 1px solid #999;
+  
+  &[type=button] {
+    background-color: #1ad;
+    transition: background-color .3s;
+    color: #fff;
+    
+    height: 30px;
+    border-radius: 15px;
+    
+    cursor: hand;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #bee9f7;
+      color: $text-color;
+    }
+  }
+}
+
+a {
+  color: $link-text-color;
+  text-decoration: none;
+
+  transition: color .3s, text-decoration .3s;
+
+  &:hover {
+    color: $link-hover-text-color;
+    text-decoration: underline;
+  }
+}
+
+.chatbox {
+  background-color: #fff;
+  height: calc(70% - 2px);
+  border: 1px solid #000;
+  margin: 0;
+  overflow: auto;
+  width: inherit;
+}
+
+.msgbox {
+  background-color: #fff;
+  color: #000;
+  
+  width: calc(100% - 6px);
+  height: calc(30% - 4px);
+  border: 1px solid #000;
+  margin: 0;
+  padding: 2px;
+}
+
+$default-name-color: #000;
+$user-admin-name-color: #fff;
+
+$default-text-color: #000;
+$user-admin-text-color: #fff;
+
+$user-admin-background-color: #000;
+$user-server-background-color: #f0e68c;
+
+
+.chatcontainer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  
+  width: 250px;
+  height: calc(100% - 4px);
+  border: 2px solid #000;
+}
+
+.chat-message {
+  color: $default-text-color;
+  border: 1px solid #000;
+  
+  margin: 0 0 1px;
+  padding: 0 2px;
+  
+  word-wrap: break-word;
+  
+  .user {
+      color: $default-name-color;
+      font-weight: bold;
+    }
+
+  &.admin {
+    background-color: $user-admin-background-color;
+    color: $user-admin-text-color;
+
+    .user {
+      color: $user-admin-name-color;
+    }
+  }
+
+  &.server {
+    background-color: $user-server-background-color;
+    border: 1px solid #008800;
+  }
+}

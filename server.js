@@ -68,11 +68,10 @@ Object.prototype.map = function(callback) {
 };
 
 FILES = {
-  root: ['/index.js', '/index.css', '/index.html', '/login.html', '/register.html'],
+  root: ['/index.js', '/style.css', '/chat.html', '/register.html'],
   recursive: ['/images'],
   redir: {
-    '/': '/index.html',
-    '/login': '/login.html',
+    '/': '/chat.html',
     '/register': '/register.html'
   }
 };

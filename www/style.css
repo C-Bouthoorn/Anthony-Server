@@ -1,0 +1,131 @@
+/* line 13, style.scss */
+html body {
+  background: #72c4ff;
+  background-image: linear-gradient(to top, #4c8bb8 32%, #72c4ff 90%);
+  color: #09c;
+  font-family: "Tahoma", "Geneva", sans-serif;
+  font-size: 14;
+  font-weight: 400;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  text-align: center;
+  overflow: hidden; }
+
+/* line 28, style.scss */
+.error {
+  background: #dc143c;
+  background: linear-gradient(to bottom, #dc143c, #eeeeee 175px); }
+
+/* line 33, style.scss */
+.status {
+  background: #0f0;
+  background: linear-gradient(to bottom, #0f0, #eeeeee 175px);
+  transition: background .2s;
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  width: 400px;
+  margin: 0 auto 8px;
+  padding: 4px 16px 4px 16px;
+  border-radius: 10px; }
+
+/* line 48, style.scss */
+.loginform {
+  background: #eeeeee;
+  background: linear-gradient(to bottom, #cccccc, #eeeeee 175px);
+  position: relative;
+  line-height: 5px;
+  z-index: 20;
+  font-weight: bold;
+  text-decoration: none;
+  width: 300px;
+  margin: auto;
+  padding: 0 12px;
+  border: 1px solid #999;
+  border-radius: 10px; }
+
+/* line 66, style.scss */
+input {
+  background-color: #fff;
+  width: 100%;
+  height: 25px;
+  display: block;
+  padding: 0 2px;
+  border: 1px solid #999; }
+  /* line 75, style.scss */
+  input[type=button] {
+    background-color: #1ad;
+    transition: background-color .3s;
+    color: #fff;
+    height: 30px;
+    border-radius: 15px;
+    cursor: hand;
+    cursor: pointer; }
+    /* line 86, style.scss */
+    input[type=button]:hover {
+      background-color: #bee9f7;
+      color: #09c; }
+
+/* line 93, style.scss */
+a {
+  color: #9f9;
+  text-decoration: none;
+  transition: color .3s, text-decoration .3s; }
+  /* line 99, style.scss */
+  a:hover {
+    color: #9ff;
+    text-decoration: underline; }
+
+/* line 105, style.scss */
+.chatbox {
+  background-color: #fff;
+  height: calc(70% - 2px);
+  border: 1px solid #000;
+  margin: 0;
+  overflow: auto;
+  width: inherit; }
+
+/* line 114, style.scss */
+.msgbox {
+  background-color: #fff;
+  color: #000;
+  width: calc(100% - 6px);
+  height: calc(30% - 4px);
+  border: 1px solid #000;
+  margin: 0;
+  padding: 2px; }
+
+/* line 135, style.scss */
+.chatcontainer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 250px;
+  height: calc(100% - 4px);
+  border: 2px solid #000; }
+
+/* line 145, style.scss */
+.chat-message {
+  color: #000;
+  border: 1px solid #000;
+  margin: 0 0 1px;
+  padding: 0 2px;
+  word-wrap: break-word; }
+  /* line 154, style.scss */
+  .chat-message .user {
+    color: #000;
+    font-weight: bold; }
+  /* line 159, style.scss */
+  .chat-message.admin {
+    background-color: #000;
+    color: #fff; }
+    /* line 163, style.scss */
+    .chat-message.admin .user {
+      color: #fff; }
+  /* line 168, style.scss */
+  .chat-message.server {
+    background-color: #f0e68c;
+    border: 1px solid #008800; }
+
+/*# sourceMappingURL=style.css.map */

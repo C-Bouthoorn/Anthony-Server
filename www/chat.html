@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Chatroom - Register</title>
+    <title>Chatroom - Login</title>
 
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
@@ -11,9 +11,10 @@
     <link rel="stylesheet" href="/style.css">
   </head>
   <body onload="init()">
+    <div class="status" id="connstatus"></div>
     <div class="loginform">
       <p>
-        Register for an account or <a href="/">login</a>!
+        Enter your login data or <a href="/register">register</a>!
       </p>
       Username:
       <p>
@@ -23,11 +24,10 @@
       <p>
         <input id="password" maxlength="128" value="" type="password">
       </p>
-      Repeat Password:
-      <p>
-        <input id="password2" maxlength="128" value="" type="password">
-      </p>
-      <input id="btn" onclick="register()" value="Register" type="button">
+      <input id="btn" onclick="login()" value="Login" type="button">
+      <input id="remember" type="checkbox" checked>
     </div>
+
+
   </body>
 </html>
