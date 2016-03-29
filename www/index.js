@@ -2,7 +2,7 @@
 /*jshint jquery: true*///;
 /*globals io:false, console:false *///;
 'use strict';
-var init, initchat, login, register, safe, sessionid, setstatus, socket;
+var escapeRegex, init, initchat, login, parseEmoji, register, safe, sessionid, setstatus, socket;
 
 socket = null;
 
@@ -33,6 +33,27 @@ safe = function(callback) {
     console.log(err);
     return setstatus(err.message, true);
   }
+};
+
+escapeRegex = function(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+};
+
+parseEmoji = function(html) {
+  var emoji, emojis, i, len, link, name, ref;
+  emojis = {
+    ':)': "http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg"
+  };
+  ref = ['20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'eyeroll', 'fabulous', 'facehoof', 'greed', 'hero', 'laugh', 'lie', 'lyraexcited', 'lyrasad', 'NM2', 'NM3', 'notamused', 'photofinish', 'ppsmile', 'pwink', 'RDhuh', 'rdsmile', 'rdwink', 'scared', 'science', 'seriousTS', 'shiny', 'shrug', 'somethingwentwrong', 'spikemov', 'spike', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile', 'twiblush', 'umad', 'vinyl', 'XTUXSmiley', 'YEAH'];
+  for (i = 0, len = ref.length; i < len; i++) {
+    name = ref[i];
+    emojis[":" + name + ":"] = "/images/" + name + ".png";
+  }
+  for (emoji in emojis) {
+    link = emojis[emoji];
+    html = html.replace(new RegExp(escapeRegex(emoji), 'gi'), "<img alt='" + emoji + "' src='" + link + "'>");
+  }
+  return html;
 };
 
 init = function() {
@@ -111,7 +132,7 @@ initchat = function() {
       if (user.name !== "SERVER") {
         html += "<span class='user'>" + user.name + ": </span>";
       }
-      html += message + "</p>";
+      html += (parseEmoji(message)) + "</p>";
       return $('#chatbox').html(html + $('#chatbox').html());
     });
   });

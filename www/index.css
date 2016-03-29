@@ -1,30 +1,30 @@
 @charset "UTF-8";
-/* line 26, index.scss */
+/* line 27, index.scss */
 html {
   background-color: #333;
   color: #f9f;
   font-family: "Open Sans", sans-serif;
   font-weight: 400; }
 
-/* line 33, index.scss */
+/* line 34, index.scss */
 body {
   padding-left: 25%;
   padding-top: 1%;
   width: 50%; }
 
-/* line 39, index.scss */
+/* line 40, index.scss */
 .status {
   color: #fff;
   font-weight: 300;
   padding-left: 20px;
   transition: color .1s; }
 
-/* line 47, index.scss */
+/* line 48, index.scss */
 .error {
   color: #f00;
   font-weight: 600; }
 
-/* line 52, index.scss */
+/* line 53, index.scss */
 input {
   background-color: #fff;
   border: 0;
@@ -33,69 +33,69 @@ input {
   font-family: "Open Sans", sans-serif;
   padding: 2px 5px;
   transition: background-color .3s; }
-  /* line 64, index.scss */
+  /* line 65, index.scss */
   input:focus {
     background-color: #cff; }
-  /* line 68, index.scss */
+  /* line 69, index.scss */
   input[type=button] {
     border-radius: 5px; }
-    /* line 71, index.scss */
+    /* line 72, index.scss */
     input[type=button]:hover {
       background-color: #dff; }
-    /* line 75, index.scss */
+    /* line 76, index.scss */
     input[type=button]:focus {
       background-color: #bff; }
 
-/* line 81, index.scss */
+/* line 82, index.scss */
 a {
   color: #9f9;
   text-decoration: none;
   transition: color .3s, text-decoration .3s; }
-  /* line 87, index.scss */
+  /* line 88, index.scss */
   a:hover {
     color: #9ff;
     text-decoration: underline; }
 
-/* line 94, index.scss */
+/* line 95, index.scss */
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0; }
 
-/* line 100, index.scss */
+/* line 101, index.scss */
 nav {
   margin: 0;
   padding: 0; }
-  /* line 104, index.scss */
+  /* line 105, index.scss */
   nav ul {
     list-style: none;
     margin: 0;
     padding: 0 0 10px 10px; }
-    /* line 111, index.scss */
+    /* line 112, index.scss */
     nav ul li::before {
       content: '×';
       padding-right: 10px; }
 
-/* line 120, index.scss */
+/* line 121, index.scss */
 table {
   border-collapse: separate; }
-  /* line 125, index.scss */
+  /* line 126, index.scss */
   table tr td:first-child {
     font-weight: 600;
     padding-right: 20px; }
 
-/* line 133, index.scss */
+/* line 134, index.scss */
 .chatbox {
   background-color: #fff;
-  font-family: 'Georgia', serif;
+  font-family: "Tahoma", "Geneva", sans-serif;
   height: calc(70% - 2px);
   border: 1px solid #000;
   margin: 0;
   overflow: auto;
   width: inherit; }
 
-/* line 143, index.scss */
+/* line 144, index.scss */
 .msgbox {
-  font-family: 'Georgia', serif;
+  font-family: "Tahoma", "Geneva", sans-serif;
   background-color: #fff;
   color: #000;
   width: calc(100% - 6px);
@@ -104,7 +104,7 @@ table {
   margin: 0;
   padding: 2px; }
 
-/* line 166, index.scss */
+/* line 167, index.scss */
 .chatcontainer {
   position: absolute;
   right: 0;
@@ -113,29 +113,29 @@ table {
   height: calc(100% - 4px);
   border: 2px solid #000; }
 
-/* line 178, index.scss */
+/* line 179, index.scss */
 .chat-message {
   color: #000;
   border: 1px solid #000;
   margin: 0 0 1px;
   padding: 0 3px;
   word-wrap: break-word; }
-  /* line 188, index.scss */
+  /* line 189, index.scss */
   .chat-message.normal .user {
     color: #000; }
-  /* line 193, index.scss */
+  /* line 194, index.scss */
   .chat-message.admin {
     background-color: #000;
     color: #fff; }
-    /* line 197, index.scss */
+    /* line 198, index.scss */
     .chat-message.admin .user {
       color: #fff;
       font-weight: 600; }
-  /* line 203, index.scss */
+  /* line 204, index.scss */
   .chat-message.server {
     background-color: #f0e68c;
     border: 1px solid #008800; }
-    /* line 207, index.scss */
+    /* line 208, index.scss */
     .chat-message.server .user {
       font-weight: 600; }
 

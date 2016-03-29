@@ -90,8 +90,10 @@ FILES.recursive.map (folder) ->
       throw err
 
     files.map (file) ->
-      app.get "#{WWW_ROOT+folder}/#{file}", (req, res) ->
-        res.sendFile "#{WWW_ROOT+folder}/#{file}"
+      filename = "#{folder}/#{file}"
+
+      app.get filename, (req, res) ->
+        res.sendFile "#{WWW_ROOT}/#{filename}"
 
 FILES.redir.map (file, dest) ->
   app.get file, (req, res) ->
@@ -112,10 +114,6 @@ SERVER_USER = {
 
 parseMessage = (x) ->
   html = HTML.encode(x, true).replace /&#10;/g, '<br>'
-
-  console.log html
-
-  html = html.replace /:\)/g, '<img src="http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg">'
 
   return html
 
@@ -426,4 +424,5 @@ cmdline = readline.createInterface {
 
 cmdline.on 'line', (message) ->
   if message.length > 0
+    # No encoding - Server is smart
     sendMessage SERVER_USER, message

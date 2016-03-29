@@ -32,6 +32,34 @@ safe = (callback) ->
     setstatus err.message, true
 
 
+escapeRegex = (str) ->
+  str.replace /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"
+
+
+parseEmoji = (html) ->
+  emojis = {
+    ':)': "http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg"
+  }
+
+  for name in [
+    '20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'eyeroll', 'fabulous',
+    'facehoof', 'greed', 'hero', 'laugh', 'lie', 'lyraexcited', 'lyrasad', 'NM2', 'NM3', 'notamused', 'photofinish',
+    'ppsmile', 'pwink', 'RDhuh', 'rdsmile', 'rdwink', 'scared', 'science', 'seriousTS', 'shiny', 'shrug',
+    'somethingwentwrong', 'spikemov', 'spike', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile',
+    'twiblush', 'umad', 'vinyl', 'XTUXSmiley', 'YEAH'
+  ]
+
+    emojis[":#{name}:"] = "/images/#{name}.png"
+
+  for emoji of emojis
+    link = emojis[emoji]
+
+    html = html.replace new RegExp(escapeRegex(emoji), 'gi'), "<img alt='#{emoji}' src='#{link}'>"
+
+
+  return html
+
+
 init = ->
   safe ->
     socket = io.connect()
@@ -112,7 +140,7 @@ initchat = ->
       unless user.name is "SERVER"
         html += "<span class='user'>#{user.name}: </span>"
 
-      html += "#{message}</p>"
+      html += "#{parseEmoji message}</p>"
 
       $('#chatbox').html html + $('#chatbox').html()
 

@@ -68,7 +68,8 @@ Object.prototype.map = function(callback) {
 };
 
 FILES = {
-  root: ['/index.js', '/index.css', '/index.html', '/login.html', '/register.html', '/emojione/svg/1f603.svg'],
+  root: ['/index.js', '/index.css', '/index.html', '/login.html', '/register.html'],
+  recursive: ['/images'],
   redir: {
     '/': '/index.html',
     '/login': '/login.html',
@@ -81,6 +82,21 @@ WWW_ROOT = __dirname + "/www";
 FILES.root.map(function(file) {
   return app.get(file, function(req, res) {
     return res.sendFile(WWW_ROOT + file);
+  });
+});
+
+FILES.recursive.map(function(folder) {
+  return fs.readdir("" + (WWW_ROOT + folder), function(err, files) {
+    if (err) {
+      throw err;
+    }
+    return files.map(function(file) {
+      var filename;
+      filename = folder + "/" + file;
+      return app.get(filename, function(req, res) {
+        return res.sendFile(WWW_ROOT + "/" + filename);
+      });
+    });
   });
 });
 
@@ -104,8 +120,6 @@ SERVER_USER = {
 parseMessage = function(x) {
   var html;
   html = HTML.encode(x, true).replace(/&#10;/g, '<br>');
-  console.log(html);
-  html = html.replace(/:\)/g, '<img src="http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg">');
   return html;
 };
 
