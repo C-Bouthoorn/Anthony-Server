@@ -342,7 +342,9 @@ io.sockets.on 'connection', (socket) ->
 
             console.log "Registration for user '#{username}' done"
 
-            socket.emit 'register-complete', { }
+            socket.emit 'register-complete', {
+              username: username
+            }
 
 
   socket.on 'login', (data) ->
