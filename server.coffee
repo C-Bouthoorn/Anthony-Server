@@ -291,6 +291,7 @@ io.sockets.on 'connection', (socket) ->
     do (data=data) ->
       username = data.username
       password = data.password
+      type = 'user'
 
       if username is undefined or password is undefined
         console.log "Username or password undefined"
@@ -335,7 +336,7 @@ io.sockets.on 'connection', (socket) ->
           if err
             throw err
 
-          qq = "INSERT INTO #{USER_TABLE} (username, password) VALUES (#{db.escape(username)}, #{db.escape(hash)})"
+          qq = "INSERT INTO #{USER_TABLE} (username, password, type) VALUES (#{db.escape(username)}, #{db.escape(hash)}, #{db.escape(type)})"
 
           db.query qq, (err, data) ->
             if err
