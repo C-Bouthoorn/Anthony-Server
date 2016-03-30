@@ -93,7 +93,7 @@ init = function() {
     socket.on('disconnect', function() {
       return setstatus('Lost connection!', true);
     });
-    $('body').keyup(function(event) {
+    $('.loginform').keydown(function(event) {
       if (event.keyCode === 13) {
         return $('#btn').click();
       }
@@ -109,7 +109,7 @@ init = function() {
       return setstatus('Failed to login:', data.error, true);
     });
     socket.on('register-complete', function(data) {
-      return setstatus("Welcome to our server, " + username + " !");
+      return setstatus("Username '" + data.username + "' has been successfully registered");
     });
     socket.on('register-failed', function(data) {
       return setstatus('Failed to register', data.error, true);
@@ -149,9 +149,10 @@ initchat = function() {
           return $('#refreshlink a').hide();
         });
       });
-      $('#msgbox').keyup(function(event) {
+      $('#msgbox').keydown(function(event) {
         var message;
-        if (event.keyCode === 13 && !event.shiftKey) {
+        if (event.keyCode === 13) {
+          event.preventDefault();
           message = $('#msgbox').val();
           $('#msgbox').val('');
           return socket.emit('client-send-message', {

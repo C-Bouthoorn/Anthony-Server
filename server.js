@@ -121,7 +121,7 @@ escapeRegex = function(str) {
 };
 
 encodeHTML = function(str) {
-  return HTML.encode(str, true).replace(/&#10;/g, '<br>');
+  return HTML.encode(str, true).replace(/&#10;/g, '');
 };
 
 parseMessage = function(x) {
@@ -283,7 +283,7 @@ io.sockets.on('connection', function(socket) {
         return;
       }
       console.log("Registration request received for user '" + username + "'");
-      qq = "SELECT id FROM " + USER_TABLE + " WHERE username = " + (db.escape(username));
+      qq = "SELECT id FROM " + USER_TABLE + " WHERE BINARY username = " + (db.escape(username));
       return db.query(qq, function(err, data) {
         if (data.length > 0) {
           console.log("User '" + username + "' already exists");
@@ -302,7 +302,9 @@ io.sockets.on('connection', function(socket) {
               throw err;
             }
             console.log("Registration for user '" + username + "' done");
-            return socket.emit('register-complete', {});
+            return socket.emit('register-complete', {
+              username: username
+            });
           });
         });
       });
@@ -336,7 +338,7 @@ io.sockets.on('connection', function(socket) {
         return;
       }
       console.log("Login request received for user '" + username + "'");
-      qq = "SELECT password, channel_perms, type FROM " + USER_TABLE + " WHERE username = " + (db.escape(username));
+      qq = "SELECT password, channel_perms, type FROM " + USER_TABLE + " WHERE BINARY username = " + (db.escape(username));
       return db.query(qq, function(err, data) {
         var hash;
         if (err) {
