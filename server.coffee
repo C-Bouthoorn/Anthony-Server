@@ -116,7 +116,7 @@ escapeRegex = (str) ->
 
 
 encodeHTML = (str) ->
-  HTML.encode(str, true).replace /&#10;/g, '<br>'
+  HTML.encode(str, true).replace /&#10;/g, ''
 
 
 parseMessage = (x) ->
@@ -318,7 +318,7 @@ io.sockets.on 'connection', (socket) ->
       console.log "Registration request received for user '#{username}'"
 
 
-      qq = "SELECT id FROM #{USER_TABLE} WHERE username = #{db.escape(username)}"
+      qq = "SELECT id FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
 
       db.query qq, (err, data) ->
         if data.length > 0
@@ -342,7 +342,9 @@ io.sockets.on 'connection', (socket) ->
 
             console.log "Registration for user '#{username}' done"
 
-            socket.emit 'register-complete', { }
+            socket.emit 'register-complete', {
+              username: username
+            }
 
 
   socket.on 'login', (data) ->
@@ -381,7 +383,7 @@ io.sockets.on 'connection', (socket) ->
 
       console.log "Login request received for user '#{username}'"
 
-      qq = "SELECT password, channel_perms, type FROM #{USER_TABLE} WHERE username = #{db.escape(username)}"
+      qq = "SELECT password, channel_perms, type FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
 
       db.query qq, (err, data) ->
         if err

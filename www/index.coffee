@@ -94,7 +94,7 @@ init = ->
     socket.on 'disconnect', ->
       setstatus 'Lost connection!', true
 
-    $('body').keyup (event) ->
+    $('.loginform').keydown (event) ->
       if event.keyCode == 13  # Enter
         $('#btn').click()
 
@@ -111,7 +111,7 @@ init = ->
 
     # Register
     socket.on 'register-complete', (data) ->
-      setstatus "Welcome to our server, #{username} !"
+      setstatus "Username '#{data.username}' has been successfully registered"
 
     socket.on 'register-failed', (data) ->
       setstatus 'Failed to register', data.error, true
@@ -153,8 +153,9 @@ initchat = ->
         socket.on 'disconnect', ->
           $('#refreshlink a').hide()
 
-      $('#msgbox').keyup (event) ->
-        if event.keyCode is 13 and not event.shiftKey # Enter
+      $('#msgbox').keydown (event) ->
+        if event.keyCode is 13 # Enter
+          event.preventDefault()
           message = $('#msgbox').val()
           $('#msgbox').val('')
 
