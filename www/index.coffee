@@ -153,8 +153,9 @@ initchat = ->
         socket.on 'disconnect', ->
           $('#refreshlink a').hide()
 
-      $('#msgbox').keyup (event) ->
-        if event.keyCode is 13 and not event.shiftKey # Enter
+      $('#msgbox').keydown (event) ->
+        if event.keyCode is 13 # Enter
+          event.preventDefault()
           message = $('#msgbox').val()
           $('#msgbox').val('')
 
