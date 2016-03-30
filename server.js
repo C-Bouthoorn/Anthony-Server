@@ -128,7 +128,7 @@ parseMessage = function(x) {
   var base, baseregex, html, i, len, link, linkregex, match, matches;
   html = encodeHTML(x);
   linkregex = /(http(s?):\/\/\S*)/gi;
-  baseregex = /http(s?):\/\/([^\s\/]*)/gi;
+  baseregex = /http(s?)\:\/\/([^\/]+)/gi;
   matches = html.match(linkregex);
   if (matches == null) {
     matches = [];
@@ -138,7 +138,7 @@ parseMessage = function(x) {
     console.log("MATCH: " + match);
     link = match.replace(linkregex, '$1');
     console.log("link: " + link);
-    base = link.replace(baseregex, '$2');
+    base = baseregex.exec(link)[2];
     console.log("base: " + base);
     x = "<a href='" + link + "'>" + base + "</a>";
     html = html.replace(match, x);
@@ -285,6 +285,9 @@ io.sockets.on('connection', function(socket) {
       console.log("Registration request received for user '" + username + "'");
       qq = "SELECT id FROM " + USER_TABLE + " WHERE BINARY username = " + (db.escape(username));
       return db.query(qq, function(err, data) {
+        if (err) {
+          throw err;
+        }
         if (data.length > 0) {
           console.log("User '" + username + "' already exists");
           socket.emit('register-failed', {

@@ -125,8 +125,8 @@ parseMessage = (x) ->
   # (http(s?):\/\/\S*)
   linkregex = /(http(s?):\/\/\S*)/gi
 
-  # http(s?):\/\/([^\s\/]*)
-  baseregex = /http(s?):\/\/([^\s\/]*)/gi
+  # http(s?):\/\/([^\/]*)
+  baseregex = /http(s?)\:\/\/([^\/]+)/gi
 
   matches = html.match linkregex
   unless matches?
@@ -136,11 +136,9 @@ parseMessage = (x) ->
     console.log "MATCH: #{match}"
 
     link = match.replace linkregex, '$1'
-
     console.log "link: #{link}"
 
-    base = link.replace baseregex, '$2'
-
+    base = baseregex.exec(link)[2]
     console.log "base: #{base}"
 
     x = "<a href='#{link}'>#{base}</a>"
@@ -321,6 +319,9 @@ io.sockets.on 'connection', (socket) ->
       qq = "SELECT id FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
 
       db.query qq, (err, data) ->
+        if err
+          throw err
+
         if data.length > 0
           console.log "User '#{username}' already exists"
 
