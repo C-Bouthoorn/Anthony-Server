@@ -4,12 +4,12 @@ A server for Anthony
 
 ## HOW TO INSTALL
 
-  Run `npm install`
+  Run `./install.sh`
 
 ## HOW TO RUN SERVER
 
-  Run `./build.sh`
-  Run `npm start`
+  1. Run `./build.sh`
+  2. Run `coffee server.coffee`
 
 ## HOW TO BUILD
 

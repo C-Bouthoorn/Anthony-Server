@@ -7,3 +7,5 @@ chmod +x ./setupnode.sh
 
 sudo npm install -g coffee-script
 sudo gem install sass
+
+sudo npm install
