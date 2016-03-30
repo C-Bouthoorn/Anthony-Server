@@ -137,9 +137,9 @@ parseMessage = function(x) {
     match = matches[i];
     console.log("MATCH: " + match);
     link = match.replace(linkregex, '$1');
-    console.log(link);
-    base = match.replace(baseregex, '$2');
-    console.log(base);
+    console.log("link: " + link);
+    base = link.replace(baseregex, '$2');
+    console.log("base: " + base);
     x = "<a href='" + link + "'>" + base + "</a>";
     html = html.replace(match, x);
   }
