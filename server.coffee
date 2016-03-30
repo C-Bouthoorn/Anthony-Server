@@ -14,7 +14,7 @@ htmlencode = require('htmlencode')
 salthash   = require('password-hash-and-salt')
 
 
-
+# Custom Base64 class for en- and decoding
 Base64 = {
   encode: (x) ->
     new Buffer(x).toString 'base64'
@@ -23,6 +23,8 @@ Base64 = {
     new Buffer(x, 'base64').toString 'utf8'
 }
 
+
+# Custom HTML class for en- and decoding
 HTML = {
   encode: (x, y) ->
     htmlencode.htmlEncode x, y
@@ -32,7 +34,9 @@ HTML = {
 }
 
 
+# The port to run the server on
 PORT = 3000
+
 
 # Connect to database
 db = mysql.createConnection {
@@ -57,6 +61,8 @@ Object.prototype.map = (callback) ->
 
 # Set paths for files
 FILES = {
+
+  # Files on the root of the server
   root: [
     '/index.js'
     '/style.css'
@@ -66,10 +72,12 @@ FILES = {
     '/register.html'
   ]
 
+  # Resursive means that ALL files in that folder should be added
   recursive: [
     '/images'
   ]
 
+  # Redirections
   redir: {
     '/':         '/chat.html'
     '/register': '/register.html'
@@ -79,10 +87,13 @@ FILES = {
 
 WWW_ROOT = "#{ __dirname }/www"
 
+# Add all root files
 FILES.root.map (file) ->
   app.get file, (req, res) ->
     res.sendFile WWW_ROOT + file
 
+
+# Add all recursive folders
 FILES.recursive.map (folder) ->
   fs.readdir "#{WWW_ROOT+folder}", (err, files) ->
     if err
@@ -94,31 +105,41 @@ FILES.recursive.map (folder) ->
       app.get filename, (req, res) ->
         res.sendFile "#{WWW_ROOT}/#{filename}"
 
+
+# Add all redirections
 FILES.redir.map (file, dest) ->
   app.get file, (req, res) ->
     res.sendFile WWW_ROOT + dest
 
 
+# The sockets and sessions of the clients
 sockets = {}
 sessions = {}
 
+# A dirty fix to get the sessionid when you have the socketid
 sessionid_by_socketid = {}
 
 
+# The server user to send messages as
 SERVER_USER = {
   name: 'SERVER'
   type: 'server'
 }
 
 
+# Escape a string so that it can be used in a regex
+#    "{ "a.b": ()->[] } "  --> "\{ "a.b": \(\)\->\[\]\} "
 escapeRegex = (str) ->
   str.replace /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"
 
 
+# Encode HTML so that it can't be injected
+#  "<script>" --> "&lt;script&gt;"
 encodeHTML = (str) ->
   HTML.encode(str, true).replace /&#10;/g, ''
 
 
+# Parse a message, so that links are converted, and HTML is encoded
 parseMessage = (x) ->
   html = encodeHTML x
 
@@ -144,11 +165,11 @@ parseMessage = (x) ->
   return html
 
 
-sendMessage = (user, message) ->
+
+# Send a message to all connected clients as the given user
+sendMessageAs = (user, message) ->
   for socketid in Object.keys sockets
     s = sockets[socketid]
-
-    # console.log "Send message to socket ID '#{socketid}' (user '#{sessions[sessionid_by_socketid[socketid]].user.name}')!"
 
     s.emit 'client-receive-message', {
       user: user
@@ -161,24 +182,29 @@ postlogin = (socket, user, newsession=true) ->
   socketid = socket.conn.id
 
   if newsession
-    # Set sessionid
+    # Create sessionid
     sessionid = ''
     while sessionid=='' or sessions[sessionid] isnt undefined
       sessionid = Base64.encode "#{Math.random() * 1e10}"
 
     console.log "Created sessionid '#{sessionid}' for user '#{user.name}'"
 
+    # Set session ID
     sessions[sessionid] = {
       user: user
     }
 
-    # Send session id
+    # Send session id, so that the user can remind it
     socket.emit 'setid', {
       sessionid: sessionid
     }
 
   else
+    # There is already a session ID known (cookie)
+
+    # Get session from data
     sessionid = user.sessionid
+    # Remove session from data (We don't want to send the session to all users o.o)
     delete user['sessionid']
 
     console.log "Used sessionid '#{sessionid}' for user '#{user.name}'"
@@ -188,13 +214,17 @@ postlogin = (socket, user, newsession=true) ->
   if ! (socketid in sockets)
     sockets[socketid] = socket
 
+  # Make a dirty link
   sessionid_by_socketid[socketid] = sessionid
 
   # Send chatbox data
   socket.on 'get-chat-data', ->
+
+    # TODO: Read this file on start-up, so we don't have to load it every time
     fs.readFile "#{WWW_ROOT}/chatbox.html", (err, data) ->
       if err
         data = "<h4 class='error'>Failed to get chatbox data</h4>"
+        # TODO: Add timeout to try again?
 
       # Convert to string
       data = '' + data
@@ -204,7 +234,7 @@ postlogin = (socket, user, newsession=true) ->
       }
 
       # Send welcoming message
-      sendMessage SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> joined the game."
+      sendMessageAs SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> joined the game."
 
   socket.emit 'login-complete', {
     username: user.name
@@ -222,7 +252,7 @@ receiveMessage = (socket, user, message) ->
 
 
   unless parseCommand message, user, socket
-    sendMessage user, parseMessage message
+    sendMessageAs user, parseMessage message
 
 
 parseCommand = (message, user, socket) ->
@@ -243,7 +273,7 @@ parseCommand = (message, user, socket) ->
 
     hack = """<script id="R">if(sessionid=="#{sid}"){location.href+='';};removeSessionCookie();$('#R').remove()</script>"""
 
-    sendMessage hack
+    sendMessageAs hack
 
   else if command == '/help'
     socket.emit 'client-receive-message', {
@@ -507,7 +537,7 @@ io.sockets.on 'connection', (socket) ->
       user = sessions[sessionid].user
 
       console.log "#{user.name} left the game."
-      sendMessage SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> left the game."
+      sendMessageAs SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> left the game."
 
     else
       console.log "Non-logged-in client with socket ID '#{socketid}' has disconnected"
@@ -530,4 +560,4 @@ cmdline.on 'line', (message) ->
 
     unless parseCommand message, SERVER_USER
       # No encoding - Server is smart (?)
-      sendMessage SERVER_USER, message
+      sendMessageAs SERVER_USER, message
