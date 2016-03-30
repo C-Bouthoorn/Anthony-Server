@@ -158,7 +158,7 @@ parseMessage = (x) ->
     link = linkregex.exec(match)[1]
     base = baseregex.exec(link)[2]
 
-    x = "<a href='#{link}'>#{base}</a>"
+    x = "<a href='#{link}' target='_blank'>#{base}</a>"
 
     html = html.replace match, x
 
