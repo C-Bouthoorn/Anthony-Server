@@ -133,13 +133,9 @@ parseMessage = (x) ->
     matches = []
 
   for match in matches
-    console.log "MATCH: #{match}"
 
-    link = match.replace linkregex, '$1'
-    console.log "link: #{link}"
-
+    link = linkregex.exec(match)[1]
     base = baseregex.exec(link)[2]
-    console.log "base: #{base}"
 
     x = "<a href='#{link}'>#{base}</a>"
 
