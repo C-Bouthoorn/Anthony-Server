@@ -264,9 +264,10 @@ io.sockets.on('connection', function(socket) {
       return;
     }
     return (function(data) {
-      var password, qq, regex, username;
+      var password, qq, regex, type, username;
       username = data.username;
       password = data.password;
+      type = 'user';
       if (username === void 0 || password === void 0) {
         console.log("Username or password undefined");
         socket.emit('register-failed', {
@@ -299,7 +300,7 @@ io.sockets.on('connection', function(socket) {
           if (err) {
             throw err;
           }
-          qq = "INSERT INTO " + USER_TABLE + " (username, password) VALUES (" + (db.escape(username)) + ", " + (db.escape(hash)) + ")";
+          qq = "INSERT INTO " + USER_TABLE + " (username, password, type) VALUES (" + (db.escape(username)) + ", " + (db.escape(hash)) + ", " + (db.escape(type)) + ")";
           return db.query(qq, function(err, data) {
             if (err) {
               throw err;
