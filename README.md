@@ -8,10 +8,9 @@ A server for Anthony
 
 ## HOW TO RUN SERVER
 
-  Run `npm build` or `./build.sh`  (See How to build)  
+  Run `./build.sh`
   Run `npm start`
 
 ## HOW TO BUILD
 
-  Run `npm build` (without output)  
-  Run `./build.sh` (with output)
+  Run `./build.sh`
