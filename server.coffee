@@ -39,16 +39,33 @@ PORT = 3000
 
 
 # Connect to database
-db = mysql.createConnection {
+db_config = 
   host:     'localhost'
   user:     'root'
   password: 'root'
   database: 'chat_dev'
-}
 
 USER_TABLE = 'users'
 
-db.connect()
+db = undefined
+
+handleDisconnect = ->
+  db = mysql.createConnection(db_config)
+  db.connect (err) ->
+    if err
+      console.log 'error when connecting to db:', err
+      setTimeout handleDisconnect, 2000
+    return
+  db.on 'error', (err) ->
+    console.log 'db error', err
+    if err.code == 'PROTOCOL_CONNECTION_LOST'
+      handleDisconnect()
+    else
+      throw err
+    return
+  return
+
+handleDisconnect()
 
 
 # Monkey patch hash loop
