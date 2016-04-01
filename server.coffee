@@ -318,12 +318,12 @@ io.sockets.on 'connection', (socket) ->
   if ip == "127.0.0.1"
     ip = "localhost"
 
-  console.log "[CONNECT ] '#{ip}' connected with socket ID '#{socketid}'"
+  console.log "[CONNECT ] #{ip} connected with socket ID '#{socketid}'"
 
 
   socket.on 'register', (data) ->
     if data is undefined
-      console.log "[REGISTER] '#{ip}' : No data received"
+      console.log "[REGISTER] #{ip} : No data received"
 
       socket.emit 'register-failed', {
         error: "No data received"
@@ -337,7 +337,7 @@ io.sockets.on 'connection', (socket) ->
       type = 'user'
 
       if username is undefined or password is undefined
-        console.log "[REGISTER] '#{ip}' : Username/password undefined"
+        console.log "[REGISTER] #{ip} : Username/password undefined"
 
         socket.emit 'register-failed', {
           error: "Username or password undefined"
@@ -349,7 +349,7 @@ io.sockets.on 'connection', (socket) ->
       regex = /^[a-zA-Z0-9_]{2,64}$/
 
       unless (regex.test username) and (password.length >= 4)
-        console.log "[REGISTER] '#{ip}' : Username/password don't match requirements!"
+        console.log "[REGISTER] #{ip} : Username/password don't match requirements!"
 
         socket.emit 'register-failed', {
           error: "Username/password don't match requirements!"
@@ -357,7 +357,7 @@ io.sockets.on 'connection', (socket) ->
 
         return
 
-      console.log "[REGISTER] '#{ip}' : Registration request for user '#{username}'"
+      console.log "[REGISTER] #{ip} : Registration request for user '#{username}'"
 
 
       qq = "SELECT id FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
@@ -367,7 +367,7 @@ io.sockets.on 'connection', (socket) ->
           throw err
 
         if data.length > 0
-          console.log "[REGISTER] '#{ip}' : User '#{username}' already exists with ID '#{data[0].id}'"
+          console.log "[REGISTER] #{ip} : User '#{username}' already exists with ID '#{data[0].id}'"
 
           socket.emit 'register-failed', {
             error: "Username already exists"
@@ -385,7 +385,7 @@ io.sockets.on 'connection', (socket) ->
             if err
               throw err
 
-            console.log "[REGISTER] '#{ip}' : Registration for user '#{username}' completed"
+            console.log "[REGISTER] #{ip} : Registration for user '#{username}' completed"
 
             socket.emit 'register-complete', {
               username: username
@@ -394,7 +394,7 @@ io.sockets.on 'connection', (socket) ->
 
   socket.on 'login', (data) ->
     if data is undefined
-      console.log "[ LOG-IN ] '#{ip}' : No data received"
+      console.log "[ LOG-IN ] #{ip} : No data received"
 
       socket.emit 'login-failed', {
         error: "No data received"
@@ -407,7 +407,7 @@ io.sockets.on 'connection', (socket) ->
       password = data.password
 
       if username is undefined or password is undefined
-        console.log "[ LOG-IN ] '#{ip}' : Username/password undefined!"
+        console.log "[ LOG-IN ] #{ip} : Username/password undefined!"
 
         socket.emit 'login-failed', {
           error: "Username or password undefined"
@@ -418,7 +418,7 @@ io.sockets.on 'connection', (socket) ->
       regex = /^[a-zA-Z0-9_]{2,64}$/
 
       unless (regex.test username) and (password.length >= 4)
-        console.log "[ LOG-IN ] '#{ip}' : Username/password don't match requirements!"
+        console.log "[ LOG-IN ] #{ip} : Username/password don't match requirements!"
 
         socket.emit 'login-failed', {
           error: "Username/password don't match requirements!"
@@ -426,7 +426,7 @@ io.sockets.on 'connection', (socket) ->
 
         return
 
-      console.log "[ LOG-IN ] '#{ip}' : Login request for user '#{username}'"
+      console.log "[ LOG-IN ] #{ip} : Login request for user '#{username}'"
 
       qq = "SELECT password, channel_perms, type FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
 
@@ -435,7 +435,7 @@ io.sockets.on 'connection', (socket) ->
           throw err
 
         if data.length < 1
-          console.log "[ LOG-IN ] '#{ip}' : User '#{username}' not found"
+          console.log "[ LOG-IN ] #{ip} : User '#{username}' not found"
 
           socket.emit 'login-failed', {
             error: "Username/password incorrect!"
@@ -451,7 +451,7 @@ io.sockets.on 'connection', (socket) ->
             throw err
 
           unless verified
-            console.log "[ LOG-IN ] '#{ip}' : User '#{username}' with id '#{data[0].id}' failed to login - hash mismatch"
+            console.log "[ LOG-IN ] #{ip} : User '#{username}' with id '#{data[0].id}' failed to login - hash mismatch"
 
             socket.emit 'login-failed', {
               error: "Username/password incorrect!"
@@ -459,7 +459,7 @@ io.sockets.on 'connection', (socket) ->
 
             return
 
-          console.log "[ LOG-IN ] '#{ip}' : User '#{username}' logged in"
+          console.log "[ LOG-IN ] #{ip} : User '#{username}' logged in"
 
           # Get user permissions and type
           channel_perms = data[0].channel_perms
@@ -480,7 +480,7 @@ io.sockets.on 'connection', (socket) ->
 
   socket.on 'client-cookie-login', (data) ->
     if data is undefined
-      console.log "[ COOKIE ] '#{ip}' : No data received"
+      console.log "[ COOKIE ] #{ip} : No data received"
 
       socket.emit 'login-failed', {
         error: "No data received"
@@ -491,7 +491,7 @@ io.sockets.on 'connection', (socket) ->
     sessionid = data.sessionid
 
     if sessionid is undefined
-      console.log "[ COOKIE ] '#{ip}' : Cookie invalid"
+      console.log "[ COOKIE ] #{ip} : Cookie invalid"
 
       socket.emit 'login-failed', {
         error: "Invalid cookie"
@@ -500,7 +500,7 @@ io.sockets.on 'connection', (socket) ->
       return
 
     if sessions[sessionid] is undefined
-      console.log "[ COOKIE ] '#{ip}' : Session not found!"
+      console.log "[ COOKIE ] #{ip} : Session not found!"
 
       socket.emit 'login-failed', {
         error: "Invalid cookie"
@@ -511,36 +511,36 @@ io.sockets.on 'connection', (socket) ->
     user = sessions[sessionid].user
     user.sessionid = sessionid
 
-    console.log "[ COOKIE ] '#{ip}' : User '#{user.name}' logged in with session ID '#{sessionid}'"
+    console.log "[ COOKIE ] #{ip} : User '#{user.name}' logged in with session ID '#{sessionid}'"
 
     postlogin socket, user, false
 
 
   socket.on 'client-send-message', (data) ->
     if data is undefined
-      console.log "[MESSAGE ] '#{ip}' : No data received"
+      console.log "[MESSAGE ] #{ip} : No data received"
       return
 
     message = data.message
 
     if message is undefined
-      console.log "[MESSAGE ] '#{ip}' : No message received"
+      console.log "[MESSAGE ] #{ip} : No message received"
       return
 
     sessionid = data.sessionid
 
     if sessionid is undefined
-      console.log "[MESSAGE ] '#{ip}' : No session ID received"
+      console.log "[MESSAGE ] #{ip} : No session ID received"
       return
 
     if sessions[sessionid] is undefined
-      console.log "[MESSAGE ] '#{ip}' : Session ID '#{data.sessionid}' not found in sessions"
+      console.log "[MESSAGE ] #{ip} : Session ID '#{data.sessionid}' not found in sessions"
       return
 
     user = sessions[sessionid].user
 
     if user is undefined
-      console.log "[MESSAGE ] '#{ip}' : Session ID #{data.sessionid} exists, but no user is associated with it?"
+      console.log "[MESSAGE ] #{ip} : Session ID #{data.sessionid} exists, but no user is associated with it?"
       return
 
     receiveMessage socket, user, message
@@ -553,7 +553,7 @@ io.sockets.on 'connection', (socket) ->
     if sessionid isnt undefined
       user = sessions[sessionid].user
 
-      console.log "[  CHAT  ] '#{ip}' : '#{user.name}' left the game."
+      console.log "[  CHAT  ] #{ip} : #{user.name} left the game."
       sendMessageAs SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> left the game."
 
     else
