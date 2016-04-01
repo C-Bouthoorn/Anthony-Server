@@ -204,7 +204,7 @@ postlogin = (socket, user, newsession=true) ->
     while sessionid=='' or sessions[sessionid] isnt undefined
       sessionid = Base64.encode "#{Math.random() * 1e10}"
 
-    console.log "[SESS__ID] Assigned '#{sessionid}' to user '#{user.name}'"
+    console.log "[ SESSID ] Assigned '#{sessionid}' to user '#{user.name}'"
 
     # Set session ID
     sessions[sessionid] = {
@@ -224,7 +224,7 @@ postlogin = (socket, user, newsession=true) ->
     # Remove session from data (We don't want to send the session to all users o.o)
     delete user['sessionid']
 
-    console.log "[SESS__ID] Re-assigned '#{sessionid}' to user '#{user.name}'"
+    console.log "[ SESSID ] Re-assigned '#{sessionid}' to user '#{user.name}'"
 
 
   # Add to chat clients
@@ -318,7 +318,7 @@ io.sockets.on 'connection', (socket) ->
   if ip == "127.0.0.1"
     ip = "localhost"
 
-  console.log "[CONNECT ] #{ip} connected with socket ID '#{socketid}'"
+  console.log "[ CONNEC ] #{ip} connected with socket ID '#{socketid}'"
 
 
   socket.on 'register', (data) ->
@@ -519,29 +519,29 @@ io.sockets.on 'connection', (socket) ->
 
   socket.on 'client-send-message', (data) ->
     if data is undefined
-      console.log "[MESSAGE ] #{ip} : No data received"
+      console.log "[  MESG  ] #{ip} : No data received"
       return
 
     message = data.message
 
     if message is undefined
-      console.log "[MESSAGE ] #{ip} : No message received"
+      console.log "[  MESG  ] #{ip} : No message received"
       return
 
     sessionid = data.sessionid
 
     if sessionid is undefined
-      console.log "[MESSAGE ] #{ip} : No session ID received"
+      console.log "[  MESG  ] #{ip} : No session ID received"
       return
 
     if sessions[sessionid] is undefined
-      console.log "[MESSAGE ] #{ip} : Session ID '#{data.sessionid}' not found in sessions"
+      console.log "[  MESG  ] #{ip} : Session ID '#{data.sessionid}' not found in sessions"
       return
 
     user = sessions[sessionid].user
 
     if user is undefined
-      console.log "[MESSAGE ] #{ip} : Session ID #{data.sessionid} exists, but no user is associated with it?"
+      console.log "[  MESG  ] #{ip} : Session ID #{data.sessionid} exists, but no user is associated with it?"
       return
 
     receiveMessage socket, user, message
@@ -558,7 +558,7 @@ io.sockets.on 'connection', (socket) ->
       sendMessageAs SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> left the game."
 
     else
-      console.log "[DISCONN ] Non-logged-in client with socket ID '#{socketid}' has disconnected"
+      console.log "[ DISCON ] Non-logged-in client with socket ID '#{socketid}' has disconnected"
 
     unless sockets[socketid] is undefined
       delete sockets[socketid]
