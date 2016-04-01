@@ -428,7 +428,7 @@ io.sockets.on 'connection', (socket) ->
 
       console.log "[ LOG-IN ] #{ip} : Login request for user '#{username}'"
 
-      qq = "SELECT password, channel_perms, type FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
+      qq = "SELECT id, password, channel_perms, type FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
 
       db.query qq, (err, data) ->
         if err
@@ -444,6 +444,7 @@ io.sockets.on 'connection', (socket) ->
           return
 
         hash = data[0].password
+        id = data[0].id
 
         # Verify the hash
         salthash( password ).verifyAgainst hash, (err, verified) ->
@@ -451,7 +452,7 @@ io.sockets.on 'connection', (socket) ->
             throw err
 
           unless verified
-            console.log "[ LOG-IN ] #{ip} : User '#{username}' with id '#{data[0].id}' failed to login - hash mismatch"
+            console.log "[ LOG-IN ] #{ip} : User '#{username}' with id #{id} failed to login - hash mismatch"
 
             socket.emit 'login-failed', {
               error: "Username/password incorrect!"
