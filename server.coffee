@@ -13,7 +13,8 @@ readline   = require('readline')
 htmlencode = require('htmlencode')
 salthash   = require('password-hash-and-salt')
 
-doCommands = require('./commands')
+require('coffee-script')  # Lets me require coffeescript files B-)
+doCommands = require('./commands.coffee')
 
 
 # Custom Base64 class for en- and decoding
@@ -180,36 +181,25 @@ sendMessageAs = (user, message) ->
 
 
 # Called when a player succesfully logged in
-postlogin = (socket, user, newsession=true) ->
+postlogin = (socket, user) ->
   socketid = socket.conn.id
 
-  if newsession
-    # Create sessionid
-    sessionid = ''
-    while sessionid=='' or sessions[sessionid] isnt undefined
-      sessionid = Base64.encode "#{Math.random() * 1e10}"
+  # Create sessionid
+  sessionid = ''
+  while sessionid=='' or sessions[sessionid] isnt undefined
+    sessionid = Base64.encode "#{Math.random() * 1e10}"
 
-    console.log "[ SESSID ] Assigned '#{sessionid}' to user '#{user.name}'"
+  console.log "[ SESSID ] Assigned '#{sessionid}' to user '#{user.name}'"
 
-    # Set session ID
-    sessions[sessionid] = {
-      user: user
-    }
+  # Set session ID
+  sessions[sessionid] = {
+    user: user
+  }
 
-    # Send session id, so that the user can remind it
-    socket.emit 'setid', {
-      sessionid: sessionid
-    }
-
-  else
-    # There is already a session ID known (cookie)
-
-    # Get session from data
-    sessionid = user.sessionid
-    # Remove session from data (We don't want to send the session to all users o.o)
-    delete user['sessionid']
-
-    console.log "[ SESSID ] Re-assigned '#{sessionid}' to user '#{user.name}'"
+  # Send session id, so that the user can remind it
+  socket.emit 'setid', {
+    sessionid: sessionid
+  }
 
 
   # Add to chat clients
@@ -491,44 +481,6 @@ io.sockets.on 'connection', (socket) ->
             channel_perms: channel_perms
             type: usertype
           }
-
-
-  socket.on 'client-cookie-login', (data) ->
-    if data is undefined
-      console.log "[ COOKIE ] #{ip} : No data received"
-
-      socket.emit 'login-failed', {
-        error: "No data received"
-      }
-
-      return
-
-    sessionid = data.sessionid
-
-    if sessionid is undefined
-      console.log "[ COOKIE ] #{ip} : Cookie invalid"
-
-      socket.emit 'login-failed', {
-        error: "Invalid cookie"
-      }
-
-      return
-
-    if sessions[sessionid] is undefined
-      console.log "[ COOKIE ] #{ip} : Session not found!"
-
-      socket.emit 'login-failed', {
-        error: "Invalid cookie"
-      }
-
-      return
-
-    user = sessions[sessionid].user
-    user.sessionid = sessionid
-
-    console.log "[ COOKIE ] #{ip} : User '#{user.name}' logged in with session ID '#{sessionid}'"
-
-    postlogin socket, user, false
 
 
   socket.on 'client-send-message', (data) ->

@@ -7,24 +7,24 @@ socket = null
 sessionid = null
 
 
-setSessionCookie = ->
+setUsernameCookie = (username) ->
   if Cookies is undefined
     return undefined
 
   if $('#remember').is ':checked'
-    Cookies.set 'sessionid', sessionid
+    Cookies.set 'username', username
 
-getSessionCookie = ->
+getUsernameCookie = ->
   if Cookies is undefined
     return undefined
 
-  Cookies.get 'sessionid'
+  Cookies.get 'username'
 
-removeSessionCookie = ->
+removeUsernameCookie = ->
   if Cookies is undefined
     return undefined
 
-  Cookies.remove 'sessionid'
+  Cookies.remove 'username'
 
 
 setstatus = (stat, subscr, iserror) ->
@@ -43,10 +43,12 @@ setstatus = (stat, subscr, iserror) ->
   else
     elem.removeClass 'error'
 
+
 checkPass = ->
   pass1 = $('#password').val()
   pass2 = $('#password2').val()
   registerbutton = $('#btn')
+
   if pass1 == pass2
     registerbutton.disabled = false
     $('#password2').removeClass 'badpass'
@@ -56,6 +58,7 @@ checkPass = ->
     $('#password2').removeClass 'goodpass'
     $('#password2').addClass 'badpass'
   return
+
 
 safe = (callback) ->
   try
@@ -112,11 +115,10 @@ init = ->
         $('#btn').click()
 
     # Login
-    socket.on 'login-complete', (data) ->
-      if true or rememberLogin  # Temporary
-        setSessionCookie()
+    socket.on 'login-complete', ->
+      setUsernameCookie username
 
-      setstatus "Welcome #{if username then username else data.username}!", 'Loading chat...'
+      setstatus "Welcome #{username}!", 'Loading chat...'
       initchat()
 
     socket.on 'login-failed', (data) ->
@@ -129,13 +131,9 @@ init = ->
     socket.on 'register-failed', (data) ->
       setstatus 'Failed to register', data.error, true
 
-    sessionCookie = getSessionCookie()
-    unless sessionCookie is undefined
-      sessionid = sessionCookie
-
-      socket.emit 'client-cookie-login', {
-        sessionid: sessionid
-      }
+    username = getUsernameCookie
+    if username
+      $('#username').val username
 
 
 
@@ -216,4 +214,4 @@ register = ->
 
 logout = ->
   removeSessionCookie()
-  location.href = location.href
+  location.href += ''
