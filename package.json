@@ -4,7 +4,7 @@
   "description": "A server for Anthony",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server.js"
   },
   "author": "C-Bouthoorn",
   "license": "MIT",
