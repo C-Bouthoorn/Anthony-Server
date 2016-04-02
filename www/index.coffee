@@ -47,14 +47,14 @@ checkPass = ->
   pass1 = $('#password').val()
   pass2 = $('#password2').val()
   registerbutton = $('#btn')
-  goodColor = '#0f0'
-  badColor = '#dc143c'
   if pass1 == pass2
     registerbutton.disabled = false
-    $('#password2').css('background-color', goodColor)
+    $('#password2').removeClass 'badpass'
+    $('#password2').addClass 'goodpass'
   else
     registerbutton.disabled = true
-    $('#password2').css('background-color', badColor)
+    $('#password2').removeClass 'goodpass'
+    $('#password2').addClass 'badpass'
   return
 
 safe = (callback) ->

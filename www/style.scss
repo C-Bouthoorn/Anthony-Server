@@ -74,6 +74,9 @@ $input-button-text-color: #fff;
 $input-button-background-color: #1ad;
 $input-button-hover-background-color: #bee9f7;
 
+$password-good-color: #0f0;
+$password-bad-color: #dc143c;
+
 .loginform {
   background-color: $loginform-background-color;
   background-image: linear-gradient(to top, $loginform-background-gradient, $loginform-background-color 175px);
@@ -106,6 +109,14 @@ $input-button-hover-background-color: #bee9f7;
     padding: 0 2px;
   
     width: calc(100% - 6px);
+    
+    &.badpass{
+      background-color: $password-bad-color;
+    }
+    
+    &.goodpass{
+      background-color: $password-good-color;
+    }
   
     &[type=button] {
       background-color: $input-button-background-color;
