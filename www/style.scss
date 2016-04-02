@@ -86,7 +86,7 @@ $input-button-hover-background-color: #bee9f7;
   line-height: 5px;
 
   margin: auto;
-  padding: 0 12px;
+  padding: 0 12px 12px;
 
   position: relative;
 
@@ -105,7 +105,7 @@ $input-button-hover-background-color: #bee9f7;
     height: 25px;
     padding: 0 2px;
   
-    width: 100%;
+    width: calc(100% - 6px);
   
     &[type=button] {
       background-color: $input-button-background-color;
@@ -115,8 +115,11 @@ $input-button-hover-background-color: #bee9f7;
       cursor: pointer;
   
       height: 30px;
+      margin: auto;
   
       transition: background-color .3s;
+
+      width: 80%;
   
       &:hover {
         background-color: $input-button-hover-background-color;

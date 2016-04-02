@@ -43,6 +43,19 @@ setstatus = (stat, subscr, iserror) ->
   else
     elem.removeClass 'error'
 
+checkPass = ->
+  pass1 = $('#password').val()
+  pass2 = $('#password2').val()
+  registerbutton = $('#btn')
+  goodColor = '#0f0'
+  badColor = '#dc143c'
+  if pass1 == pass2
+    registerbutton.disabled = false
+    $('#password2').css('background-color', goodColor)
+  else
+    registerbutton.disabled = true
+    $('#password2').css('background-color', badColor)
+  return
 
 safe = (callback) ->
   try
