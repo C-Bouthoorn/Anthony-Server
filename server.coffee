@@ -39,33 +39,56 @@ PORT = 3000
 
 
 # Connect to database
-db_config = 
+db_config = {
   host:     'localhost'
   user:     'root'
   password: 'root'
   database: 'chat_dev'
+}
 
 USER_TABLE = 'users'
 
+# Read messages from stdin
+cmdline = readline.createInterface {
+  input:  process.stdin
+  output: process.stdout
+}
+
+# The sockets and sessions of the clients
+sockets = {}
+sessions = {}
+
+# A dirty fix to get the sessionid when you have the socketid
+sessionid_by_socketid = {}
+
+# The server user to send messages as
+SERVER_USER = {
+  name: 'SERVER'
+  type: 'server'
+}
+
 db = undefined
 
-handleDisconnect = ->
-  db = mysql.createConnection(db_config)
+
+connectDatabase = ->
+  console.log "[ MySQL ] Connecting to database..."
+  db = mysql.createConnection db_config
+
   db.connect (err) ->
     if err
-      console.log '[ MySQL ] Error when connecting to database:', err
-      setTimeout handleDisconnect, 2000
-    return
+      # Try connecting again in 2 seconds
+      setTimeout connectDatabase, 2000
+
+      throw err
+    else
+      console.log "[ MySQL ] Connected"
+
   db.on 'error', (err) ->
-    console.log '[ MySQL ] Database error:', err
     if err.code == 'PROTOCOL_CONNECTION_LOST'
-      handleDisconnect()
+      # Try reconnecting
+      setTimeout connectDatabase, 1000
     else
       throw err
-    return
-  return
-
-handleDisconnect()
 
 
 # Monkey patch hash loop
@@ -103,46 +126,6 @@ FILES = {
 
 
 WWW_ROOT = "#{ __dirname }/www"
-
-# Add all root files
-FILES.root.map (file) ->
-  app.get file, (req, res) ->
-    res.sendFile WWW_ROOT + file
-
-
-# Add all recursive folders
-FILES.recursive.map (folder) ->
-  fs.readdir "#{WWW_ROOT+folder}", (err, files) ->
-    if err
-      throw err
-
-    files.map (file) ->
-      filename = "#{folder}/#{file}"
-
-      app.get filename, (req, res) ->
-        res.sendFile "#{WWW_ROOT}/#{filename}"
-
-
-# Add all redirections
-FILES.redir.map (file, dest) ->
-  app.get file, (req, res) ->
-    res.sendFile WWW_ROOT + dest
-
-
-# The sockets and sessions of the clients
-sockets = {}
-sessions = {}
-
-# A dirty fix to get the sessionid when you have the socketid
-sessionid_by_socketid = {}
-
-
-# The server user to send messages as
-SERVER_USER = {
-  name: 'SERVER'
-  type: 'server'
-}
-
 
 # Escape a string so that it can be used in a regex
 #    "{ "a.b": ()->[] } "  --> "\{ "a.b": \(\)\->\[\]\} "
@@ -304,6 +287,33 @@ parseCommand = (message, user, socket) ->
   return true
 
 
+# ↑  Functions | Actually doing something  ↓
+
+
+# Add all root files
+FILES.root.map (file) ->
+  app.get file, (req, res) ->
+    res.sendFile WWW_ROOT + file
+
+
+# Add all recursive folders
+FILES.recursive.map (folder) ->
+  fs.readdir "#{WWW_ROOT+folder}", (err, files) ->
+    if err
+      throw err
+
+    files.map (file) ->
+      filename = "#{folder}/#{file}"
+
+      app.get filename, (req, res) ->
+        res.sendFile "#{WWW_ROOT}/#{filename}"
+
+
+# Add all redirections
+FILES.redir.map (file, dest) ->
+  app.get file, (req, res) ->
+    res.sendFile WWW_ROOT + dest
+
 
 # Set up sockets
 io.sockets.on 'connection', (socket) ->
@@ -360,8 +370,16 @@ io.sockets.on 'connection', (socket) ->
       console.log "[REGISTER] #{ip} : Registration request for user '#{username}'"
 
 
-      qq = "SELECT id FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
+      if db is undefined
+        console.log "[REGISTER] DATABASE UNDEFINED!"
 
+        socket.emit 'register-failed', {
+          error: "Internal error. Please try again later"
+        }
+        return
+
+
+      qq = "SELECT id FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
       db.query qq, (err, data) ->
         if err
           throw err
@@ -379,8 +397,16 @@ io.sockets.on 'connection', (socket) ->
           if err
             throw err
 
-          qq = "INSERT INTO #{USER_TABLE} (username, password, type) VALUES (#{db.escape(username)}, #{db.escape(hash)}, #{db.escape(type)})"
 
+          if db is undefined
+            console.log "[REGISTER] DATABASE UNDEFINED!"
+
+            socket.emit 'register-failed', {
+              error: "Internal error. Please try again later"
+            }
+            return
+
+          qq = "INSERT INTO #{USER_TABLE} (username, password, type) VALUES (#{db.escape(username)}, #{db.escape(hash)}, #{db.escape(type)})"
           db.query qq, (err, data) ->
             if err
               throw err
@@ -428,8 +454,16 @@ io.sockets.on 'connection', (socket) ->
 
       console.log "[ LOG-IN ] #{ip} : Login request for user '#{username}'"
 
-      qq = "SELECT id, password, channel_perms, type FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
 
+      if db is undefined
+        console.log "[ LOG-IN ] DATABASE UNDEFINED!"
+
+        socket.emit 'login-failed', {
+          error: "Internal error. Please try again later"
+        }
+        return
+
+      qq = "SELECT id, password, channel_perms, type FROM #{USER_TABLE} WHERE BINARY username = #{db.escape(username)}"
       db.query qq, (err, data) ->
         if err
           throw err
@@ -564,18 +598,18 @@ io.sockets.on 'connection', (socket) ->
       delete sockets[socketid]
 
 
-http.listen PORT, ->
-  console.log "[  INFO  ] Server started on port #{PORT}!"
-
-# Read messages from stdin
-cmdline = readline.createInterface {
-  input: process.stdin
-  output: process.stdout
-}
-
 cmdline.on 'line', (message) ->
   if message.length > 0
 
     unless parseCommand message, SERVER_USER
       # No encoding - Server is smart (?)
       sendMessageAs SERVER_USER, message
+
+
+
+# Connect to database
+connectDatabase()
+
+# Start server
+http.listen PORT, ->
+  console.log "[  INFO  ] Server started on port #{PORT}!"
