@@ -44,7 +44,7 @@ body {
   font-weight: bold;
   line-height: 5px;
   margin: auto;
-  padding: 0 12px;
+  padding: 0 12px 12px;
   position: relative;
   text-decoration: none;
   width: 300px;
@@ -56,7 +56,7 @@ body {
     display: block;
     height: 25px;
     padding: 0 2px;
-    width: 100%; }
+    width: calc(100% - 6px); }
     /* line 110, style.scss */
     .loginform input[type=button] {
       background-color: #1ad;
@@ -64,13 +64,15 @@ body {
       color: #fff;
       cursor: pointer;
       height: 30px;
-      transition: background-color .3s; }
-      /* line 121, style.scss */
+      margin: auto;
+      transition: background-color .3s;
+      width: 80%; }
+      /* line 124, style.scss */
       .loginform input[type=button]:hover {
         background-color: #bee9f7;
         color: #09c; }
 
-/* line 132, style.scss */
+/* line 135, style.scss */
 .overlay {
   background: #222;
   left: 0px;
@@ -79,7 +81,7 @@ body {
   top: 0px;
   z-index: 100; }
 
-/* line 147, style.scss */
+/* line 150, style.scss */
 .clickable {
   background: #ccc;
   background-image: linear-gradient(to top, #ccc, #eee 175px);
@@ -90,21 +92,21 @@ body {
   font-size: 12px;
   margin: 2px;
   padding: 2px; }
-  /* line 158, style.scss */
+  /* line 161, style.scss */
   .clickable:hover {
     background: #eee;
     background-image: linear-gradient(to top, #eee, #fff 175px); }
 
-/* line 167, style.scss */
+/* line 170, style.scss */
 a {
   color: #3cf;
   text-decoration: none;
   transition: text-decoration .3s; }
-  /* line 173, style.scss */
+  /* line 176, style.scss */
   a:hover {
     text-decoration: underline; }
 
-/* line 182, style.scss */
+/* line 185, style.scss */
 .chatbox {
   background-color: #fff;
   border: 1px solid #000;
@@ -113,7 +115,7 @@ a {
   overflow: auto;
   width: inherit; }
 
-/* line 198, style.scss */
+/* line 201, style.scss */
 .msgbox {
   background-color: #fff;
   border: 1px solid #000;
@@ -124,7 +126,7 @@ a {
   resize: none;
   width: calc(100% - 6px); }
 
-/* line 217, style.scss */
+/* line 220, style.scss */
 .chatcontainer {
   border: 2px solid #000;
   height: calc(100% - 4px);
@@ -134,25 +136,25 @@ a {
   top: 0;
   width: 250px; }
 
-/* line 245, style.scss */
+/* line 248, style.scss */
 .chat-message {
   border: 1px solid #000;
   color: #000;
   margin: 0 0 1px;
   padding: 0 2px 2px;
   word-wrap: break-word; }
-  /* line 254, style.scss */
+  /* line 257, style.scss */
   .chat-message .user {
     color: #000;
     font-weight: bold; }
-  /* line 259, style.scss */
+  /* line 262, style.scss */
   .chat-message.admin {
     background-color: #000;
     color: #fff; }
-    /* line 263, style.scss */
+    /* line 266, style.scss */
     .chat-message.admin .user {
       color: #fff; }
-  /* line 268, style.scss */
+  /* line 271, style.scss */
   .chat-message.server {
     background-color: #f0e68c;
     border: 1px solid #080; }

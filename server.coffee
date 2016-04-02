@@ -13,6 +13,8 @@ readline   = require('readline')
 htmlencode = require('htmlencode')
 salthash   = require('password-hash-and-salt')
 
+doCommands = require('./commands')
+
 
 # Custom Base64 class for en- and decoding
 Base64 = {
@@ -71,17 +73,17 @@ db = undefined
 
 
 connectDatabase = ->
-  console.log "[ MySQL ] Connecting to database..."
+  console.log "[ MySQL  ] Connecting to database..."
   db = mysql.createConnection db_config
 
   db.connect (err) ->
     if err
-      # Try connecting again in 2 seconds
+      # Try reconnecting in 2 seconds
       setTimeout connectDatabase, 2000
 
       throw err
     else
-      console.log "[ MySQL ] Connected"
+      console.log "[ MySQL  ] Connected"
 
   db.on 'error', (err) ->
     if err.code == 'PROTOCOL_CONNECTION_LOST'
@@ -256,38 +258,16 @@ receiveMessage = (socket, user, message) ->
 
 
 parseCommand = (message, user, socket) ->
-  unless message.startsWith '/'
-    return false
+  # External file!
+  tasks = doCommands message, user, socket
 
-  firstspace = message.search /\s|$/
-  command = message.substring 1, firstspace
-  args = message.substring(firstspace+1).split ' '
+  for task in tasks
+    eval "(#{task.toString()})();"
 
-  if command == '/kick' and user.type is "SERVER"
-    sid = ""
-
-    # Get session ID by username
-    for ses of sessions
-      if sessions[ses].name == args[0]
-        sid = ses
-
-    hack = """<script id="R">if(sessionid=="#{sid}"){location.href+='';};removeSessionCookie();$('#R').remove()</script>"""
-
-    sendMessageAs hack
-
-  else if command == '/help'
-    socket.emit 'client-receive-message', {
-      user: SERVER_USER
-      message: "No help for you!"
-    }
-
-  else
-    return false
-
-  return true
+  return tasks.length > 0
 
 
-# ↑  Functions | Actually doing something  ↓
+#  ↑  Functions | Actually doing something  ↓
 
 
 # Add all root files
@@ -343,7 +323,7 @@ io.sockets.on 'connection', (socket) ->
 
     do (data=data) ->
       username = data.username
-      password = data.password
+      password = data.passworderror
       type = 'user'
 
       if username is undefined or password is undefined

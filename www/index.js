@@ -2,7 +2,7 @@
 /*jshint jquery: true*///;
 /*globals io:false, console:false, Cookies:false *///;
 'use strict';
-var escapeRegex, getSessionCookie, init, initchat, login, logout, parseMessage, register, removeSessionCookie, safe, sessionid, setSessionCookie, setstatus, socket;
+var checkPass, escapeRegex, getSessionCookie, init, initchat, login, logout, parseMessage, register, removeSessionCookie, safe, sessionid, setSessionCookie, setstatus, socket;
 
 socket = null;
 
@@ -44,6 +44,22 @@ setstatus = function(stat, subscr, iserror) {
     return elem.addClass('error');
   } else {
     return elem.removeClass('error');
+  }
+};
+
+checkPass = function() {
+  var badColor, goodColor, pass1, pass2, registerbutton;
+  pass1 = $('#password').val();
+  pass2 = $('#password2').val();
+  registerbutton = $('#btn');
+  goodColor = '#0f0';
+  badColor = '#dc143c';
+  if (pass1 === pass2) {
+    registerbutton.disabled = false;
+    $('#password2').css('background-color', goodColor);
+  } else {
+    registerbutton.disabled = true;
+    $('#password2').css('background-color', badColor);
   }
 };
 
