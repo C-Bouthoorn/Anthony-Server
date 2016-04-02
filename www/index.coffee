@@ -50,11 +50,11 @@ checkPass = ->
   registerbutton = $('#btn')
 
   if pass1 == pass2
-    registerbutton.disabled = false
+    registerbutton.prop 'disabled', false
     $('#password2').removeClass 'badpass'
     $('#password2').addClass 'goodpass'
   else
-    registerbutton.disabled = true
+    registerbutton.prop 'disabled', true
     $('#password2').removeClass 'goodpass'
     $('#password2').addClass 'badpass'
   return
