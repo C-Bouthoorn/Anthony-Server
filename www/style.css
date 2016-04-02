@@ -35,7 +35,7 @@ body {
     background-image: linear-gradient(to bottom, #dc143c, #eee 175px);
     color: #000; }
 
-/* line 77, style.scss */
+/* line 80, style.scss */
 .loginform {
   background-color: #eee;
   background-image: linear-gradient(to top, #ccc, #eee 175px);
@@ -49,7 +49,7 @@ body {
   text-decoration: none;
   width: 300px;
   z-index: 20; }
-  /* line 99, style.scss */
+  /* line 102, style.scss */
   .loginform input {
     background-color: #fff;
     border: 1px solid #999;
@@ -57,7 +57,13 @@ body {
     height: 25px;
     padding: 0 2px;
     width: calc(100% - 6px); }
-    /* line 110, style.scss */
+    /* line 113, style.scss */
+    .loginform input.badpass {
+      background-color: #dc143c; }
+    /* line 117, style.scss */
+    .loginform input.goodpass {
+      background-color: #0f0; }
+    /* line 121, style.scss */
     .loginform input[type=button] {
       background-color: #1ad;
       border-radius: 15px;
@@ -67,12 +73,18 @@ body {
       margin: auto;
       transition: background-color .3s;
       width: 80%; }
-      /* line 124, style.scss */
+      /* line 135, style.scss */
       .loginform input[type=button]:hover {
         background-color: #bee9f7;
         color: #09c; }
 
-/* line 135, style.scss */
+/* line 144, style.scss */
+#remember {
+  display: initial;
+  height: initial;
+  width: initial; }
+
+/* line 153, style.scss */
 .overlay {
   background: #222;
   left: 0px;
@@ -81,7 +93,7 @@ body {
   top: 0px;
   z-index: 100; }
 
-/* line 150, style.scss */
+/* line 168, style.scss */
 .clickable {
   background: #ccc;
   background-image: linear-gradient(to top, #ccc, #eee 175px);
@@ -92,21 +104,21 @@ body {
   font-size: 12px;
   margin: 2px;
   padding: 2px; }
-  /* line 161, style.scss */
+  /* line 179, style.scss */
   .clickable:hover {
     background: #eee;
     background-image: linear-gradient(to top, #eee, #fff 175px); }
 
-/* line 170, style.scss */
+/* line 188, style.scss */
 a {
   color: #3cf;
   text-decoration: none;
   transition: text-decoration .3s; }
-  /* line 176, style.scss */
+  /* line 194, style.scss */
   a:hover {
     text-decoration: underline; }
 
-/* line 185, style.scss */
+/* line 203, style.scss */
 .chatbox {
   background-color: #fff;
   border: 1px solid #000;
@@ -115,7 +127,7 @@ a {
   overflow: auto;
   width: inherit; }
 
-/* line 201, style.scss */
+/* line 219, style.scss */
 .msgbox {
   background-color: #fff;
   border: 1px solid #000;
@@ -126,7 +138,7 @@ a {
   resize: none;
   width: calc(100% - 6px); }
 
-/* line 220, style.scss */
+/* line 238, style.scss */
 .chatcontainer {
   border: 2px solid #000;
   height: calc(100% - 4px);
@@ -136,25 +148,25 @@ a {
   top: 0;
   width: 250px; }
 
-/* line 248, style.scss */
+/* line 266, style.scss */
 .chat-message {
   border: 1px solid #000;
   color: #000;
   margin: 0 0 1px;
   padding: 0 2px 2px;
   word-wrap: break-word; }
-  /* line 257, style.scss */
+  /* line 275, style.scss */
   .chat-message .user {
     color: #000;
     font-weight: bold; }
-  /* line 262, style.scss */
+  /* line 280, style.scss */
   .chat-message.admin {
     background-color: #000;
     color: #fff; }
-    /* line 266, style.scss */
+    /* line 284, style.scss */
     .chat-message.admin .user {
       color: #fff; }
-  /* line 271, style.scss */
+  /* line 289, style.scss */
   .chat-message.server {
     background-color: #f0e68c;
     border: 1px solid #080; }

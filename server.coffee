@@ -194,6 +194,7 @@ postlogin = (socket, user) ->
   # Set session ID
   sessions[sessionid] = {
     user: user
+    socket: socket
   }
 
   # Send session id, so that the user can remind it
@@ -228,6 +229,14 @@ postlogin = (socket, user) ->
       # Send welcoming message
       sendMessageAs SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> joined the game."
 
+      # Dirty fix
+      parseCommand '/online', SERVER_USER, socket
+
+      socket.emit 'client-receive-message', {
+        user: SERVER_USER
+        message: "Welcome to the server! Use <b>\"/help\"</b> to see all the commands you have access to."
+      }
+
   socket.emit 'login-complete', {
     username: user.name
   }
@@ -252,7 +261,18 @@ parseCommand = (message, user, socket) ->
   tasks = doCommands message, user, socket
 
   for task in tasks
-    eval "(#{task.toString()})();"
+    if Array.isArray task
+      vars = task[0]
+      func = task[1]
+    else
+      vars = []
+      func = task
+
+    evil = "(#{func.toString()})(#{vars.join ','});"
+
+    # console.log evil
+
+    eval evil
 
   return tasks.length > 0
 
@@ -313,8 +333,8 @@ io.sockets.on 'connection', (socket) ->
 
     do (data=data) ->
       username = data.username
-      password = data.passworderror
-      type = 'user'
+      password = data.password
+      type = 'normal'
 
       if username is undefined or password is undefined
         console.log "[REGISTER] #{ip} : Username/password undefined"
@@ -472,11 +492,8 @@ io.sockets.on 'connection', (socket) ->
 
           # No need to check, as it's from the DB, and we trust the DB (right?)
 
-          # Check type
-          if usertype == ''
-            usertype = 'normal'
-
           postlogin socket, {
+            id: id
             name: username
             channel_perms: channel_perms
             type: usertype
@@ -523,12 +540,17 @@ io.sockets.on 'connection', (socket) ->
       console.log "[  CHAT  ] #{ip} : #{user.name} left the game."
       sendMessageAs SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> left the game."
 
+      delete sessions[sessionid]
+
     else
       console.log "[ DISCON ] Non-logged-in client with socket ID '#{socketid}' has disconnected"
 
-    unless sockets[socketid] is undefined
-      delete sockets[socketid]
+    delete sockets[socketid]
+    delete sessionid_by_socketid[socketid]
 
+
+cmdline.on 'SIGINT', ->
+  process.exit 0
 
 cmdline.on 'line', (message) ->
   if message.length > 0

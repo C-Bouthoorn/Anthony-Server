@@ -2,33 +2,33 @@
 /*jshint jquery: true*///;
 /*globals io:false, console:false, Cookies:false *///;
 'use strict';
-var checkPass, escapeRegex, getSessionCookie, init, initchat, login, logout, parseMessage, register, removeSessionCookie, safe, sessionid, setSessionCookie, setstatus, socket;
+var checkPass, escapeRegex, getUsernameCookie, init, initchat, login, logout, parseMessage, register, removeUsernameCookie, safe, sessionid, setUsernameCookie, setstatus, socket;
 
 socket = null;
 
 sessionid = null;
 
-setSessionCookie = function() {
+setUsernameCookie = function(username) {
   if (Cookies === void 0) {
     return void 0;
   }
   if ($('#remember').is(':checked')) {
-    return Cookies.set('sessionid', sessionid);
+    return Cookies.set('username', username);
   }
 };
 
-getSessionCookie = function() {
+getUsernameCookie = function() {
   if (Cookies === void 0) {
     return void 0;
   }
-  return Cookies.get('sessionid');
+  return Cookies.get('username');
 };
 
-removeSessionCookie = function() {
+removeUsernameCookie = function() {
   if (Cookies === void 0) {
     return void 0;
   }
-  return Cookies.remove('sessionid');
+  return Cookies.remove('username');
 };
 
 setstatus = function(stat, subscr, iserror) {
@@ -48,18 +48,18 @@ setstatus = function(stat, subscr, iserror) {
 };
 
 checkPass = function() {
-  var badColor, goodColor, pass1, pass2, registerbutton;
+  var pass1, pass2, registerbutton;
   pass1 = $('#password').val();
   pass2 = $('#password2').val();
   registerbutton = $('#btn');
-  goodColor = '#0f0';
-  badColor = '#dc143c';
   if (pass1 === pass2) {
-    registerbutton.disabled = false;
-    $('#password2').css('background-color', goodColor);
+    registerbutton.prop('disabled', false);
+    $('#password2').removeClass('badpass');
+    return $('#password2').addClass('goodpass');
   } else {
-    registerbutton.disabled = true;
-    $('#password2').css('background-color', badColor);
+    registerbutton.prop('disabled', true);
+    $('#password2').removeClass('goodpass');
+    return $('#password2').addClass('badpass');
   }
 };
 
@@ -98,7 +98,7 @@ parseMessage = function(html) {
 
 init = function() {
   return safe(function() {
-    var sessionCookie;
+    var username;
     socket = io.connect();
     socket.on('connect', function() {
       return setstatus('Connected to the server!');
@@ -111,14 +111,13 @@ init = function() {
     });
     $('.loginform').keydown(function(event) {
       if (event.keyCode === 13) {
+        event.preventDefault();
         return $('#btn').click();
       }
     });
     socket.on('login-complete', function(data) {
-      if (true || rememberLogin) {
-        setSessionCookie();
-      }
-      setstatus("Welcome " + (username ? username : data.username) + "!", 'Loading chat...');
+      setUsernameCookie(data.username);
+      setstatus("Welcome " + data.username + "!", 'Loading chat...');
       return initchat();
     });
     socket.on('login-failed', function(data) {
@@ -130,12 +129,9 @@ init = function() {
     socket.on('register-failed', function(data) {
       return setstatus('Failed to register', data.error, true);
     });
-    sessionCookie = getSessionCookie();
-    if (sessionCookie !== void 0) {
-      sessionid = sessionCookie;
-      return socket.emit('client-cookie-login', {
-        sessionid: sessionid
-      });
+    username = getUsernameCookie();
+    if (username !== void 0) {
+      return $('#username').val(username);
     }
   });
 };
@@ -218,6 +214,5 @@ register = function() {
 };
 
 logout = function() {
-  removeSessionCookie();
-  return location.href = location.href;
+  return location.href += '';
 };

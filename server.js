@@ -22,7 +22,9 @@ htmlencode = require('htmlencode');
 
 salthash = require('password-hash-and-salt');
 
-doCommands = require('./commands');
+require('coffee-script');
+
+doCommands = require('./commands.coffee');
 
 Base64 = {
   encode: function(x) {
@@ -72,14 +74,14 @@ SERVER_USER = {
 db = void 0;
 
 connectDatabase = function() {
-  console.log("[ MySQL  ] Connecting to database...");
+  console.log("[DATABASE] Connecting to database...");
   db = mysql.createConnection(db_config);
   db.connect(function(err) {
     if (err) {
       setTimeout(connectDatabase, 2000);
       throw err;
     } else {
-      return console.log("[ MySQL  ] Connected");
+      return console.log("[DATABASE] Connected");
     }
   });
   return db.on('error', function(err) {
@@ -158,29 +160,21 @@ sendMessageAs = function(user, message) {
   return results;
 };
 
-postlogin = function(socket, user, newsession) {
+postlogin = function(socket, user) {
   var sessionid, socketid;
-  if (newsession == null) {
-    newsession = true;
-  }
   socketid = socket.conn.id;
-  if (newsession) {
-    sessionid = '';
-    while (sessionid === '' || sessions[sessionid] !== void 0) {
-      sessionid = Base64.encode("" + (Math.random() * 1e10));
-    }
-    console.log("[ SESSID ] Assigned '" + sessionid + "' to user '" + user.name + "'");
-    sessions[sessionid] = {
-      user: user
-    };
-    socket.emit('setid', {
-      sessionid: sessionid
-    });
-  } else {
-    sessionid = user.sessionid;
-    delete user['sessionid'];
-    console.log("[ SESSID ] Re-assigned '" + sessionid + "' to user '" + user.name + "'");
+  sessionid = '';
+  while (sessionid === '' || sessions[sessionid] !== void 0) {
+    sessionid = Base64.encode("" + (Math.random() * 1e10));
   }
+  console.log("[ SESSID ] Assigned '" + sessionid + "' to user '" + user.name + "'");
+  sessions[sessionid] = {
+    user: user,
+    socket: socket
+  };
+  socket.emit('setid', {
+    sessionid: sessionid
+  });
   if (!(indexOf.call(sockets, socketid) >= 0)) {
     sockets[socketid] = socket;
   }
@@ -194,7 +188,12 @@ postlogin = function(socket, user, newsession) {
       socket.emit('chat-data', {
         html: data
       });
-      return sendMessageAs(SERVER_USER, "<span class='user " + user.type + "'>" + user.name + "</span> joined the game.");
+      sendMessageAs(SERVER_USER, "<span class='user " + user.type + "'>" + user.name + "</span> joined the game.");
+      parseCommand('/online', SERVER_USER, socket);
+      return socket.emit('client-receive-message', {
+        user: SERVER_USER,
+        message: "Welcome to the server! Use <b>\"/help\"</b> to see all the commands you have access to."
+      });
     });
   });
   return socket.emit('login-complete', {
@@ -214,11 +213,19 @@ receiveMessage = function(socket, user, message) {
 };
 
 parseCommand = function(message, user, socket) {
-  var i, len, task, tasks;
+  var evil, func, i, len, task, tasks, vars;
   tasks = doCommands(message, user, socket);
   for (i = 0, len = tasks.length; i < len; i++) {
     task = tasks[i];
-    eval("(" + (task.toString()) + ")();");
+    if (Array.isArray(task)) {
+      vars = task[0];
+      func = task[1];
+    } else {
+      vars = [];
+      func = task;
+    }
+    evil = "(" + (func.toString()) + ")(" + (vars.join(',')) + ");";
+    eval(evil);
   }
   return tasks.length > 0;
 };
@@ -272,8 +279,8 @@ io.sockets.on('connection', function(socket) {
     return (function(data) {
       var password, qq, regex, type, username;
       username = data.username;
-      password = data.passworderror;
-      type = 'user';
+      password = data.password;
+      type = 'normal';
       if (username === void 0 || password === void 0) {
         console.log("[REGISTER] " + ip + " : Username/password undefined");
         socket.emit('register-failed', {
@@ -399,10 +406,8 @@ io.sockets.on('connection', function(socket) {
           console.log("[ LOG-IN ] " + ip + " : User '" + username + "' logged in");
           channel_perms = data[0].channel_perms;
           usertype = data[0].type;
-          if (usertype === '') {
-            usertype = 'normal';
-          }
           return postlogin(socket, {
+            id: id,
             name: username,
             channel_perms: channel_perms,
             type: usertype
@@ -410,35 +415,6 @@ io.sockets.on('connection', function(socket) {
         });
       });
     })(data);
-  });
-  socket.on('client-cookie-login', function(data) {
-    var sessionid, user;
-    if (data === void 0) {
-      console.log("[ COOKIE ] " + ip + " : No data received");
-      socket.emit('login-failed', {
-        error: "No data received"
-      });
-      return;
-    }
-    sessionid = data.sessionid;
-    if (sessionid === void 0) {
-      console.log("[ COOKIE ] " + ip + " : Cookie invalid");
-      socket.emit('login-failed', {
-        error: "Invalid cookie"
-      });
-      return;
-    }
-    if (sessions[sessionid] === void 0) {
-      console.log("[ COOKIE ] " + ip + " : Session not found!");
-      socket.emit('login-failed', {
-        error: "Invalid cookie"
-      });
-      return;
-    }
-    user = sessions[sessionid].user;
-    user.sessionid = sessionid;
-    console.log("[ COOKIE ] " + ip + " : User '" + user.name + "' logged in with session ID '" + sessionid + "'");
-    return postlogin(socket, user, false);
   });
   socket.on('client-send-message', function(data) {
     var message, sessionid, user;
@@ -475,13 +451,17 @@ io.sockets.on('connection', function(socket) {
       user = sessions[sessionid].user;
       console.log("[  CHAT  ] " + ip + " : " + user.name + " left the game.");
       sendMessageAs(SERVER_USER, "<span class='user " + user.type + "'>" + user.name + "</span> left the game.");
+      delete sessions[sessionid];
     } else {
       console.log("[ DISCON ] Non-logged-in client with socket ID '" + socketid + "' has disconnected");
     }
-    if (sockets[socketid] !== void 0) {
-      return delete sockets[socketid];
-    }
+    delete sockets[socketid];
+    return delete sessionid_by_socketid[socketid];
   });
+});
+
+cmdline.on('SIGINT', function() {
+  return process.exit(0);
 });
 
 cmdline.on('line', function(message) {

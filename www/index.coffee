@@ -57,7 +57,6 @@ checkPass = ->
     registerbutton.prop 'disabled', true
     $('#password2').removeClass 'goodpass'
     $('#password2').addClass 'badpass'
-  return
 
 
 safe = (callback) ->
@@ -112,13 +111,14 @@ init = ->
 
     $('.loginform').keydown (event) ->
       if event.keyCode == 13  # Enter
+        event.preventDefault()
         $('#btn').click()
 
     # Login
-    socket.on 'login-complete', ->
-      setUsernameCookie username
+    socket.on 'login-complete', (data) ->
+      setUsernameCookie data.username
 
-      setstatus "Welcome #{username}!", 'Loading chat...'
+      setstatus "Welcome #{data.username}!", 'Loading chat...'
       initchat()
 
     socket.on 'login-failed', (data) ->
@@ -131,8 +131,8 @@ init = ->
     socket.on 'register-failed', (data) ->
       setstatus 'Failed to register', data.error, true
 
-    username = getUsernameCookie
-    if username
+    username = getUsernameCookie()
+    unless username is undefined
       $('#username').val username
 
 
@@ -212,6 +212,6 @@ register = ->
       password: password
     }
 
+
 logout = ->
-  removeSessionCookie()
   location.href += ''
