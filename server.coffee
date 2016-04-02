@@ -71,7 +71,7 @@ db = undefined
 
 
 connectDatabase = ->
-  console.log "[ MySQL ] Connecting to database..."
+  console.log "[DATABASE] Connecting to database..."
   db = mysql.createConnection db_config
 
   db.connect (err) ->
@@ -81,7 +81,7 @@ connectDatabase = ->
 
       throw err
     else
-      console.log "[ MySQL ] Connected"
+      console.log "[DATABASE] Connected"
 
   db.on 'error', (err) ->
     if err.code == 'PROTOCOL_CONNECTION_LOST'
