@@ -13,6 +13,9 @@ readline   = require('readline')
 htmlencode = require('htmlencode')
 salthash   = require('password-hash-and-salt')
 
+# Array includes
+require('./includes.js')
+
 require('coffee-script')  # Lets me require coffeescript files B-)
 doCommands = require('./commands.coffee')
 
@@ -50,6 +53,7 @@ db_config = {
 }
 
 USER_TABLE = 'users'
+CHANNELS_TABLE = 'channels'
 
 # Read messages from stdin
 cmdline = readline.createInterface {
@@ -60,6 +64,7 @@ cmdline = readline.createInterface {
 # The sockets and sessions of the clients
 sockets = {}
 sessions = {}
+channels = [ "general" ]
 
 # A dirty fix to get the sessionid when you have the socketid
 sessionid_by_socketid = {}
@@ -100,6 +105,14 @@ Object.prototype.map = (callback) ->
     if Object.hasOwnProperty.call this, k
       v = this[k]
       callback k, v
+
+
+# Monkey Patch array to remove items
+Array.prototype.remove = (item) ->
+  index = this.indexOf item
+
+  if index >= 0
+    this.splice index, 1
 
 
 # Set paths for files
@@ -497,6 +510,7 @@ io.sockets.on 'connection', (socket) ->
             name: username
             channel_perms: channel_perms
             type: usertype
+            channels: [ "general" ]
           }
 
 

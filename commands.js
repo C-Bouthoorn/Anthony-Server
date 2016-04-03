@@ -103,9 +103,43 @@ doCommands = function(message, user, socket) {
     tasks.push([
       [util.inspect(args)], function(args) {
         var name;
-        var name;
+        var name, qq, regex;
         name = args[0];
-        return console.log("Create channel " + name + " for " + user.name);
+        regex = /^[a-zA-Z0-9_]{2,}$/;
+        if (!regex.test(name)) {
+          console.log("[  CHNL  ] Channel doesn't match requirements");
+          socket.emit('client-receive-message', {
+            user: SERVER_USER,
+            message: "Channel name doesn't match requirements"
+          });
+          return;
+        }
+        console.log("[  CHNL  ] Create channel " + name + " for " + user.name);
+        if (channels.includes(name)) {
+          console.log("[  CHNL  ] Channel already exists!");
+          socket.emit('client-receive-message', {
+            user: SERVER_USER,
+            message: "Channel already exists! Use <code>/join " + name + "</code> to join it"
+          });
+          return;
+        }
+        channels.push(name);
+        console.log("[  CHNL  ] Channel created");
+        user.channel_perms.push(name);
+        qq = "UPDATE users SET channel_perms=" + (db.escape(user.channel_perms.join(';'))) + " WHERE id=" + user.id + ";";
+        if (db === void 0) {
+          console.log("[  CHNL  ] DATABASE UNDEFINED!");
+          return;
+        }
+        return db.query(qq, function(err, data) {
+          if (err) {
+            throw err;
+          }
+          return socket.emit('client-receive-message', {
+            user: SERVER_USER,
+            message: "Channel created. Use <code>/join " + name + "</code> to join it"
+          });
+        });
       }
     ]);
   } else if (command === '/join') {
@@ -114,7 +148,32 @@ doCommands = function(message, user, socket) {
         var name;
         var name;
         name = args[0];
-        return console.log("Join channel " + name + " " + user.name);
+        console.log("[  CHNL  ] Let " + user.name + " join channel " + name);
+        if (!user.channel_perms.split(';').includes(name)) {
+          console.log("[  CHNL  ] User doesn't have permission to join this channel!");
+          socket.emit('client-receive-message', {
+            user: SERVER_USER,
+            message: "You don't have permission to join this channel"
+          });
+          return;
+        }
+        if (!channels.includes(name)) {
+          console.log("[  CHNL  ] Channel doesn't exist!");
+          socket.emit('client-receive-message', {
+            user: SERVER_USER,
+            message: "That channel doesn't exist"
+          });
+          return;
+        }
+        user.channels.push(name);
+        console.log("[  CHNL  ] Joined!");
+        socket.emit('client-receive-message', {
+          user: SERVER_USER,
+          message: "Joined channel"
+        });
+        return socket.emit('setchannels', {
+          channels: user.channels
+        });
       }
     ]);
   } else if (command === '/leave') {
@@ -123,7 +182,23 @@ doCommands = function(message, user, socket) {
         var name;
         var name;
         name = args[0];
-        return console.log("Leave channel " + name + " " + user.name);
+        console.log("Let " + user.name + " leave channel " + name);
+        if (!user.channels.includes(name)) {
+          console.log("User hasn't joined channel!");
+          socket.emit('client-receive-message', {
+            user: SERVER_USER,
+            message: "You haven't joined that channel"
+          });
+          return;
+        }
+        user.channels.remove(name);
+        socket.emit('setchannels', {
+          channels: user.channels
+        });
+        return socket.emit('client-receive-message', {
+          user: SERVER_USER,
+          message: "Succesfully left channel!"
+        });
       }
     ]);
   } else if (command === '/report') {
@@ -133,7 +208,11 @@ doCommands = function(message, user, socket) {
         var name, reason;
         name = args[0];
         reason = args.splice(1).join(' ');
-        return console.log("[ REPORT ] " + user.name + " reported " + name + " for: " + reason);
+        console.log("[ REPORT ] " + user.name + " reported " + name + " for '" + reason + "'");
+        return socket.emit('client-receive-message', {
+          user: SERVER_USER,
+          message: "Thanks for reporting that user! We will look into it"
+        });
       }
     ]);
   } else if (command === '/rules') {
@@ -170,7 +249,7 @@ doCommands = function(message, user, socket) {
           } else {
             return -1;
           }
-        } else if ((typea === "admin") || (typea === "mod" && typeb === "")) {
+        } else if ((typea === "admin") || (typea === "mod" && typeb === "normal")) {
           return 1;
         } else {
           return -1;

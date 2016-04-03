@@ -134,7 +134,9 @@ doCommands = (message, user, socket) ->
         tag = args[0]
 
         console.log "Let #{user.name} join #{tag}"
+        # What is even a tag?
     ]
+
 
   else if command == '/create'
     tasks.push [
@@ -144,8 +146,56 @@ doCommands = (message, user, socket) ->
         `var name`
 
         name = args[0]
-        console.log "Create channel #{name} for #{user.name}"
+
+        regex = /^[a-zA-Z0-9_]{2,64}$/
+        unless regex.test name
+          console.log "[  CHNL  ] Channel doesn't match requirements"
+
+          socket.emit 'client-receive-message', {
+            user: SERVER_USER
+            message: "Channel name doesn't match requirements"
+          }
+
+          return
+
+        console.log "[  CHNL  ] Create channel #{name} for #{user.name}"
+
+        if channels.includes name
+          console.log "[  CHNL  ] Channel already exists!"
+
+          socket.emit 'client-receive-message', {
+            user: SERVER_USER
+            message: "Channel already exists! Use <code>/join #{name}</code> to join it"
+          }
+
+          return
+
+
+        channels.push name
+
+        console.log "[  CHNL  ] Channel created"
+
+        user.channel_perms.push name
+
+
+        if db is undefined
+          console.log "[  CHNL  ] DATABASE UNDEFINED!"
+          return
+
+        qq = "UPDATE #{USER_TABLE} SET channel_perms=#{db.escape user.channel_perms.join ';'} WHERE id=#{user.id};"
+        db.query qq, (err, data) ->
+          if err then throw err
+
+        qq = "INSERT INTO #{CHANNELS_TABLE} (name) VALUES (#{db.escape name});"
+        db.query qq, (err, data) ->
+          if err then throw err
+
+        socket.emit 'client-receive-message', {
+          user: SERVER_USER
+          message: "Channel created. Use <code>/join #{name}</code> to join it"
+        }
     ]
+
 
   else if command == '/join'
     tasks.push [
@@ -155,13 +205,60 @@ doCommands = (message, user, socket) ->
         `var name`
 
         name = args[0]
-        console.log "Let #{user.name} join channel #{name}"
+        console.log "[  CHNL  ] Let #{user.name} join channel #{name}"
 
-        if user.channel_perms.split(';').contains(name)
-          console.log "User has permissions!"
-        else
-          console.log "User can't join this channel!"
+        unless user.channel_perms.split(';').includes name
+          console.log "[  CHNL  ] User doesn't have permission to join this channel!"
+
+          socket.emit 'client-receive-message', {
+            user: SERVER_USER
+            message: "You don't have permission to join this channel"
+          }
+
+          return
+
+
+        unless channels.includes name
+          console.log "[  CHNL  ] Channel doesn't exist!"
+
+          socket.emit 'client-receive-message', {
+            user: SERVER_USER
+            message: "That channel doesn't exist"
+          }
+
+          return
+
+
+        user.channels.push name
+
+        console.log "[  CHNL  ] Joined!"
+
+        socket.emit 'client-receive-message', {
+          user: SERVER_USER
+          message: "Joined channel"
+        }
+
+        socket.emit 'setchannels', {
+          channels: user.channels
+        }
     ]
+
+
+  else if command == '/invite'
+    tasks.push [
+      [ util.inspect args ],
+
+      (args) ->
+        `var username, name`
+
+        username = args[0]
+        name = args[1]
+
+
+
+
+    ]
+
 
   else if command == '/leave'
     tasks.push [
@@ -171,8 +268,31 @@ doCommands = (message, user, socket) ->
         `var name`
 
         name = args[0]
-        console.log "Leave channel #{name} #{user.name}"
+        console.log "Let #{user.name} leave channel #{name}"
+
+        unless user.channels.includes name
+          console.log "User hasn't joined channel!"
+
+          socket.emit 'client-receive-message', {
+            user: SERVER_USER
+            message: "You haven't joined that channel"
+          }
+
+          return
+
+
+        user.channels.remove name
+
+        socket.emit 'setchannels', {
+          channels: user.channels
+        }
+
+        socket.emit 'client-receive-message', {
+          user: SERVER_USER
+          message: "Succesfully left channel!"
+        }
     ]
+
 
   # Other
   else if command == '/report'
@@ -185,8 +305,14 @@ doCommands = (message, user, socket) ->
         name = args[0]
         reason = args.splice(1).join(' ')
 
-        console.log "[ REPORT ] #{user.name} reported #{name} for: #{reason}"
+        console.log "[ REPORT ] #{user.name} reported #{name} for '#{reason}'"
+
+        socket.emit 'client-receive-message', {
+          user: SERVER_USER
+          message: "Thanks for reporting that user! We will look into it"
+        }
     ]
+
 
   else if command == '/rules'
     tasks.push () ->

@@ -5,6 +5,7 @@
 
 socket = null
 sessionid = null
+channels = []
 
 
 setUsernameCookie = (username) ->
@@ -78,7 +79,7 @@ parseMessage = (html) ->
   }
 
   for name in [
-    '20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'eyeroll', 'fabulous',
+    '20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'derp', 'eyeroll', 'fabulous',
     'facehoof', 'greed', 'hero', 'laugh', 'lie', 'lyraexcited', 'lyrasad', 'NM2', 'NM3', 'notamused', 'photofinish',
     'ppsmile', 'pwink', 'RDhuh', 'rdsmile', 'rdwink', 'scared', 'science', 'seriousTS', 'shiny', 'shrug',
     'somethingwentwrong', 'spikemov', 'spike', 'squee', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile',
@@ -109,10 +110,12 @@ init = ->
     socket.on 'disconnect', ->
       setstatus 'Lost connection!', true
 
-    $('.loginform').keydown (event) ->
+
+    $('#password').keydown (event) ->
       if event.keyCode == 13  # Enter
         event.preventDefault()
         $('#btn').click()
+
 
     # Login
     socket.on 'login-complete', (data) ->
@@ -142,6 +145,7 @@ initchat = ->
     socket.on 'disconnect', ->
       unless $('#msgbox')?
         alert 'Disconnected from server!'
+
 
     socket.on 'chat-data', (data) ->
       html = data.html
@@ -175,6 +179,7 @@ initchat = ->
             message: message
           }
 
+
       socket.on 'client-receive-message', (data) ->
         user = data.user
         message = data.message
@@ -187,6 +192,13 @@ initchat = ->
         html += "#{parseMessage message}</p>"
 
         $('#chatbox').html html + $('#chatbox').html()
+
+
+      socket.on 'setchannels', (data) ->
+        channels = data.channels
+
+        $('#channels').html "Channels: #{channels.join ", "}"
+
 
     socket.emit 'get-chat-data', {}
 

@@ -2,11 +2,13 @@
 /*jshint jquery: true*///;
 /*globals io:false, console:false, Cookies:false *///;
 'use strict';
-var checkPass, escapeRegex, getUsernameCookie, init, initchat, login, logout, parseMessage, register, removeUsernameCookie, safe, sessionid, setUsernameCookie, setstatus, socket;
+var channels, checkPass, escapeRegex, getUsernameCookie, init, initchat, login, logout, parseMessage, register, removeUsernameCookie, safe, sessionid, setUsernameCookie, setstatus, socket;
 
 socket = null;
 
 sessionid = null;
+
+channels = [];
 
 setUsernameCookie = function(username) {
   if (Cookies === void 0) {
@@ -84,7 +86,7 @@ parseMessage = function(html) {
     ':)': "http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg",
     ':unicorn:': "http://emojione.com/wp-content/uploads/assets/emojis/1f984.svg"
   };
-  ref = ['20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'eyeroll', 'fabulous', 'facehoof', 'greed', 'hero', 'laugh', 'lie', 'lyraexcited', 'lyrasad', 'NM2', 'NM3', 'notamused', 'photofinish', 'ppsmile', 'pwink', 'RDhuh', 'rdsmile', 'rdwink', 'scared', 'science', 'seriousTS', 'shiny', 'shrug', 'somethingwentwrong', 'spikemov', 'spike', 'squee', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile', 'twiblush', 'umad', 'vinyl', 'XTUXSmiley', 'yay', 'YEAH'];
+  ref = ['20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'derp', 'eyeroll', 'fabulous', 'facehoof', 'greed', 'hero', 'laugh', 'lie', 'lyraexcited', 'lyrasad', 'NM2', 'NM3', 'notamused', 'photofinish', 'ppsmile', 'pwink', 'RDhuh', 'rdsmile', 'rdwink', 'scared', 'science', 'seriousTS', 'shiny', 'shrug', 'somethingwentwrong', 'spikemov', 'spike', 'squee', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile', 'twiblush', 'umad', 'vinyl', 'XTUXSmiley', 'yay', 'YEAH'];
   for (i = 0, len = ref.length; i < len; i++) {
     name = ref[i];
     emojis[":" + name + ":"] = "/images/" + name + ".png";
@@ -109,7 +111,7 @@ init = function() {
     socket.on('disconnect', function() {
       return setstatus('Lost connection!', true);
     });
-    $('.loginform').keydown(function(event) {
+    $('#password').keydown(function(event) {
       if (event.keyCode === 13) {
         event.preventDefault();
         return $('#btn').click();
@@ -173,7 +175,7 @@ initchat = function() {
           });
         }
       });
-      return socket.on('client-receive-message', function(data) {
+      socket.on('client-receive-message', function(data) {
         var message, user;
         user = data.user;
         message = data.message;
@@ -183,6 +185,10 @@ initchat = function() {
         }
         html += (parseMessage(message)) + "</p>";
         return $('#chatbox').html(html + $('#chatbox').html());
+      });
+      return socket.on('setchannels', function(data) {
+        channels = data.channels;
+        return $('#channels').html("Channels: " + (channels.join(", ")));
       });
     });
     return socket.emit('get-chat-data', {});

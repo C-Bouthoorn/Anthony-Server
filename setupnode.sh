@@ -80,10 +80,12 @@ if [ "$mynode" != "$latestnode" ]; then
     # sudo ln -s "/usr/local/bin/node-$latestnode/bin/npm" "/usr/local/bin/npm"
 
     echo -e "\nChecking link"
-    if [ ! -f "/usr/local/bin/nodejs" ]; then
-      echo "Creating link"
-      sudo ln "/usr/local/bin/node" "/usr/local/bin/nodejs"
+    if [ -f "/usr/local/bin/nodejs" ]; then
+      sudo rm "/usr/local/bin/nodejs"
     fi
+
+    echo -e "\nCreating link"
+    sudo ln "/usr/local/bin/node" "/usr/local/bin/nodejs"
   else
     echo -e "\nFailed to get new version. Is your connection still working?"
   fi

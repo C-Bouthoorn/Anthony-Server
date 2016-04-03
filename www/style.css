@@ -87,13 +87,13 @@ body {
 /* line 153, style.scss */
 .overlay {
   background: #222;
-  left: 0px;
+  left: 0;
   padding: 2px;
   position: absolute;
-  top: 0px;
+  top: 0;
   z-index: 100; }
 
-/* line 168, style.scss */
+/* line 169, style.scss */
 .clickable {
   background: #ccc;
   background-image: linear-gradient(to top, #ccc, #eee 175px);
@@ -104,21 +104,21 @@ body {
   font-size: 12px;
   margin: 2px;
   padding: 2px; }
-  /* line 179, style.scss */
+  /* line 180, style.scss */
   .clickable:hover {
     background: #eee;
     background-image: linear-gradient(to top, #eee, #fff 175px); }
 
-/* line 188, style.scss */
+/* line 189, style.scss */
 a {
   color: #3cf;
   text-decoration: none;
   transition: text-decoration .3s; }
-  /* line 194, style.scss */
+  /* line 195, style.scss */
   a:hover {
     text-decoration: underline; }
 
-/* line 203, style.scss */
+/* line 204, style.scss */
 .chatbox {
   background-color: #fff;
   border: 1px solid #000;
@@ -127,7 +127,7 @@ a {
   overflow: auto;
   width: inherit; }
 
-/* line 219, style.scss */
+/* line 220, style.scss */
 .msgbox {
   background-color: #fff;
   border: 1px solid #000;
@@ -138,7 +138,7 @@ a {
   resize: none;
   width: calc(100% - 6px); }
 
-/* line 238, style.scss */
+/* line 239, style.scss */
 .chatcontainer {
   border: 2px solid #000;
   height: calc(100% - 4px);
@@ -148,27 +148,32 @@ a {
   top: 0;
   width: 250px; }
 
-/* line 266, style.scss */
+/* line 267, style.scss */
 .chat-message {
   border: 1px solid #000;
   color: #000;
   margin: 0 0 1px;
   padding: 0 2px 2px;
   word-wrap: break-word; }
-  /* line 275, style.scss */
+  /* line 276, style.scss */
   .chat-message .user {
     color: #000;
     font-weight: bold; }
-  /* line 280, style.scss */
+  /* line 281, style.scss */
   .chat-message.admin {
     background-color: #000;
     color: #fff; }
-    /* line 284, style.scss */
+    /* line 285, style.scss */
     .chat-message.admin .user {
       color: #fff; }
-  /* line 289, style.scss */
+  /* line 290, style.scss */
   .chat-message.server {
     background-color: #f0e68c;
     border: 1px solid #080; }
+
+/* line 299, style.scss */
+.channels {
+  color: #f00;
+  font-weight: bold; }
 
 /*# sourceMappingURL=style.css.map */
