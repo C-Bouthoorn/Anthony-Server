@@ -13,6 +13,9 @@ readline   = require('readline')
 htmlencode = require('htmlencode')
 salthash   = require('password-hash-and-salt')
 
+# Console timestamps
+require( "console-stamp" )( console, { pattern : "yyyy-mm-dd'T'HH:MM:ss", label : false, colors: { stamp: "yellow" } } )
+
 # Array includes
 require('./includes.js')
 
@@ -93,6 +96,7 @@ connectDatabase = ->
 
   db.on 'error', (err) ->
     if err.code == 'PROTOCOL_CONNECTION_LOST'
+      console.log "[DATABASE] Lost Connection! Reconnecting..."
       # Try reconnecting
       setTimeout connectDatabase, 1000
     else
