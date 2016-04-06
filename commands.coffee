@@ -435,7 +435,7 @@ Report a player. Troll reports will be punished!
               # Relies on target to not check incoming messages...
               targetsock.emit 'client-receive-message', {
                 user: SERVER_USER
-                message: "<script>location.href+='';</script>"
+                message: "<script>removeUsernameCookie();location.href+='';</script>"
               }
 
               break
