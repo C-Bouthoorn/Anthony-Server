@@ -28,7 +28,7 @@ doCommands = (message, user, socket) ->
 
         color = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set fur color #{color} for '#{user.name}'"
+        console.log "[PONY_CMD]".black.bgCyan + " Set fur color #{color} for user #{user.name}"
     ]
 
   else if command == '/mane'
@@ -40,7 +40,7 @@ doCommands = (message, user, socket) ->
 
         color = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set mane color #{color} for '#{user.name}'"
+        console.log "[PONY_CMD]".black.bgCyan + " Set mane color #{color} for user #{user.name}"
     ]
 
   else if command == '/tailstyle'
@@ -52,7 +52,7 @@ doCommands = (message, user, socket) ->
 
         style = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set tail style #{style} for '#{user.name}'"
+        console.log "[PONY_CMD]".black.bgCyan + " Set tail style #{style} for user #{user.name}"
     ]
 
   else if command == '/manestyle'
@@ -64,7 +64,7 @@ doCommands = (message, user, socket) ->
 
         style = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set mane style #{style} for '#{user.name}'"
+        console.log "[PONY_CMD]".black.bgCyan + " Set mane style #{style} for user #{user.name}"
     ]
 
   else if command == '/fullstyle'
@@ -76,7 +76,7 @@ doCommands = (message, user, socket) ->
 
         style = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set style #{style} for '#{user.name}'"
+        console.log "[PONY_CMD]".black.bgCyan + " Set style #{style} for user #{user.name}"
     ]
 
 
@@ -87,7 +87,7 @@ doCommands = (message, user, socket) ->
 
       (args) ->
 
-        console.log "[PONY_CMD]".black.bgCyan + " '#{user.name}' teleported to spawn"
+        console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to spawn"
     ]
 
   else if command == '/sethome'
@@ -96,7 +96,7 @@ doCommands = (message, user, socket) ->
 
       (args) ->
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set home for '#{user.name}'"
+        console.log "[PONY_CMD]".black.bgCyan + " Set home for user #{user.name}"
     ]
 
 
@@ -106,7 +106,7 @@ doCommands = (message, user, socket) ->
 
       (args) ->
 
-        console.log "[PONY_CMD]".black.bgCyan + " '#{user.name}' teleported to home"
+        console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to home"
     ]
 
 
@@ -119,7 +119,7 @@ doCommands = (message, user, socket) ->
 
         name = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " '#{user.name}' teleported to '#{name}'"
+        console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to #{name}"
     ]
 
 
@@ -144,7 +144,7 @@ doCommands = (message, user, socket) ->
 
           return
 
-        console.log "[  CHNL  ]".black.bgGreen + " Create channel '#{name}' for '#{user.name}'"
+        console.log "[  CHNL  ]".black.bgGreen + " Create channel #{name} for user #{user.name}"
 
         if channels.includes name
           console.log "[  CHNL  ]".black.bgRed + " Channel already exists!"
@@ -174,7 +174,7 @@ doCommands = (message, user, socket) ->
         db.query qq, (err, data) ->
           if err then throw err
 
-        console.log "[  CHNL  ]".black.bgGreen + " Channel '#{name}' created"
+        console.log "[  CHNL  ]".black.bgGreen + " Channel #{name} created"
 
         socket.emit 'client-receive-message', {
           user: SERVER_USER
@@ -193,7 +193,7 @@ doCommands = (message, user, socket) ->
         name = args[0]
 
         unless user.channel_perms.split(';').includes name
-          console.log "[  CHNL  ]".black.bgRed + " User '#{user.name}' doesn't have permission to join channel '#{name}'!"
+          console.log "[  CHNL  ]".black.bgRed + " User #{user.name} doesn't have permission to join channel #{name}!"
 
           socket.emit 'client-receive-message', {
             user: SERVER_USER
@@ -204,7 +204,7 @@ doCommands = (message, user, socket) ->
 
 
         unless channels.includes name
-          console.log "[  CHNL  ]".black.bgRed + " Channel '#{name}' doesn't exist!"
+          console.log "[  CHNL  ]".black.bgRed + " Channel #{name} doesn't exist!"
 
           socket.emit 'client-receive-message', {
             user: SERVER_USER
@@ -216,7 +216,7 @@ doCommands = (message, user, socket) ->
 
         user.channels.push name
 
-        console.log "[  CHNL  ]".black.bgGreen + " '#{user.name}' joined channel '#{name}'"
+        console.log "[  CHNL  ]".black.bgGreen + " User #{user.name} joined channel #{name}"
 
         socket.emit 'client-receive-message', {
           user: SERVER_USER
@@ -253,10 +253,10 @@ doCommands = (message, user, socket) ->
         `var name`
 
         name = args[0]
-        console.log "[  CHNL  ]".black.bgRed + "'#{user.name}' left channel '#{name}'"
+        console.log "[  CHNL  ]".black.bgRed + "user #{user.name} left channel #{name}"
 
         unless user.channels.includes name
-          console.log "[  CHNL  ]".black.bgRed + "User '#{user.name}' isn't in channel '#{name}'!"
+          console.log "[  CHNL  ]".black.bgRed + "User #{user.name} isn't in channel #{name}!"
 
           socket.emit 'client-receive-message', {
             user: SERVER_USER
@@ -289,7 +289,7 @@ doCommands = (message, user, socket) ->
 
         tag = args[0]
 
-        console.log "[MINIGAME]".black.bgMagenta + "'#{user.name}' joined the tag!"
+        console.log "[MINIGAME]".black.bgMagenta + "user #{user.name} joined the tag!"
     ]
 
 
@@ -304,7 +304,7 @@ doCommands = (message, user, socket) ->
         name = args[0]
         reason = args.splice(1).join(' ')
 
-        console.log "[ REPORT ]".red.bgWhite + " '#{user.name}' reported '#{name}' for " + "'#{reason}'".underline
+        console.log "[ REPORT ]".red.bgWhite + " User #{user.name} reported #{name} for " + "#{reason}".underline
 
         socket.emit 'client-receive-message', {
           user: SERVER_USER
