@@ -63,6 +63,7 @@ cmdline = readline.createInterface {
   input:  process.stdin
   output: process.stdout
 }
+cmdline.setPrompt('')
 
 # The sockets and sessions of the clients
 sockets = {}
