@@ -14,7 +14,7 @@ htmlencode = require('htmlencode')
 salthash   = require('password-hash-and-salt')
 
 # Console timestamps
-require( "console-stamp" )( console, { pattern : "yyyy-mm-dd'T'HH:MM:ss", label : false, colors: { stamp: "yellow" } } )
+require( "console-stamp" )( console, { pattern : "yyyy-mm-dd'T'HH:MM:ss", label : false, colors: { stamp: ["yellow", "bold"] } } )
 
 # Array includes
 require('./includes.js')
@@ -266,7 +266,7 @@ receiveMessage = (socket, user, message) ->
   if message.length < 1
     return
 
-  console.log "[  CHAT  ]".black.bgCyan + " '#{user.name}': '#{message}'"
+  console.log "[  CHAT  ]".black.bgCyan + " #{user.name}:".bold + " #{message}"
 
 
   unless parseCommand message, user, socket
@@ -557,7 +557,7 @@ io.sockets.on 'connection', (socket) ->
 
       console.log "[  CHAT  ]".black.bgCyan + " #{ip} : #{user.name} left the game."
       sendMessageAs SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> left the game."
-      console.log "[ DISCON ]".black.bgRed + " #{ip} : #{user.name} logged out"
+      console.log "[ LOGOUT ]".black.bgRed + " #{ip} : #{user.name} logged out"
 
       delete sessions[sessionid]
 
