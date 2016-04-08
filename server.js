@@ -134,7 +134,7 @@ Array.prototype.remove = function(item) {
 
 FILES = {
   root: ['/index.js', '/style.css', '/style.css.map', '/chat.html', '/register.html'],
-  recursive: ['/images'],
+  recursive: ['/images', '/images/textures', '/images/textures/converted'],
   redir: {
     '/': '/chat.html',
     '/register': '/register.html'
@@ -270,7 +270,7 @@ FILES.root.map(function(file) {
 });
 
 FILES.recursive.map(function(folder) {
-  return fs.readdir("" + (WWW_ROOT + folder), function(err, files) {
+  fs.readdir("" + (WWW_ROOT + folder), function(err, files) {
     if (err) {
       throw err;
     }
@@ -281,6 +281,16 @@ FILES.recursive.map(function(folder) {
         return res.sendFile(WWW_ROOT + "/" + filename);
       });
     });
+  });
+  return fs.watch("" + (WWW_ROOT + folder), function(change, file) {
+    var filename;
+    if (change === 'rename') {
+      console.log("New file '" + file + "' added!");
+      filename = folder + "/" + file;
+      return app.get(filename, function(req, res) {
+        return res.sendFile(WWW_ROOT + "/" + filename);
+      });
+    }
   });
 });
 

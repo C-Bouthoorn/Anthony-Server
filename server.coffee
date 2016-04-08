@@ -139,9 +139,12 @@ FILES = {
     '/register.html'
   ]
 
-  # Resursive means that ALL files in that folder should be added
+  # Resursive means that all FILES in that folder should be added
   recursive: [
     '/images'
+    '/images/emoji'
+    '/images/textures'
+    '/images/textures/converted'
   ]
 
   # Redirections
@@ -330,6 +333,13 @@ FILES.recursive.map (folder) ->
       throw err
 
     files.map (file) ->
+      filename = "#{folder}/#{file}"
+
+      app.get filename, (req, res) ->
+        res.sendFile "#{WWW_ROOT}/#{filename}"
+
+  fs.watch "#{WWW_ROOT+folder}", (change, file) ->
+    if change == 'rename'  # Add/rename/remove file
       filename = "#{folder}/#{file}"
 
       app.get filename, (req, res) ->

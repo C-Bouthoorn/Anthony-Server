@@ -1,4 +1,12 @@
-node_modules
-screenshots*
 backup
+screenshots*
+
+# npm
+node_modules
+
+# setupnode.js
 nodejstmp
+
+# Eclipse
+.metadata
+.recommenders
