@@ -1,29 +1,24 @@
-// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes
-if (!Array.prototype.includes) {
-  Array.prototype.includes = function(searchElement /*, fromIndex*/ ) {
+// Based on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes
+
+if ( ! Array.prototype.includes ) {
+  Array.prototype.includes = function(searchElement) {
     'use strict';
-    var O = Object(this);
-    var len = parseInt(O.length) || 0;
+
+    var len = this.length;
     if (len === 0) {
       return false;
     }
-    var n = parseInt(arguments[1]) || 0;
-    var k;
-    if (n >= 0) {
-      k = n;
-    } else {
-      k = len + n;
-      if (k < 0) {k = 0;}
-    }
+
     var currentElement;
-    while (k < len) {
-      currentElement = O[k];
-      if (searchElement === currentElement ||
-         (searchElement !== searchElement && currentElement !== currentElement)) { // NaN !== NaN
+    
+    for (var i=0; i<len; i++) {
+      currentElement = this[i];
+
+      if ( searchElement === currentElement || (isNaN(searchElement) && isNaN(currentElement)) ) {
         return true;
       }
-      k++;
     }
+
     return false;
   };
 }

@@ -7,20 +7,27 @@ app        = require('express')()
 http       = require('http').Server(app)
 io         = require('socket.io')(http)
 fs         = require('fs')
+exec       = require('child_process').exec
 util       = require('util')
 mysql      = require('mysql')
+stamp      = require('console-stamp')
 readline   = require('readline')
-htmlencode = require('htmlencode')
 salthash   = require('password-hash-and-salt')
+htmlencode = require('htmlencode')
 
 # Console timestamps
-require( "console-stamp" )( console, {
-  pattern: "dd/mm/yyyy' 'HH:MM:ss.l"
+stamp console, {
+  pattern: 'dd/mm/yyyy HH:MM:ss.l'
   label: false
   colors: {
-    stamp: ["yellow", "bold"]
+    stamp:  [ 'blue', 'bold']  # Time
+
+    c_OK:   [ 'black', 'bgGreen'  ]
+    c_INFO: [ 'black', 'bgYellow' ]
+    c_ERR:  [ 'black', 'bgRed'    ]
+    c_CHAT: [ 'black', 'bgCyan'   ]
   }
-})
+}
 
 # Array includes
 require('./includes.js')
@@ -64,20 +71,24 @@ db_config = {
 USER_TABLE = 'users'
 CHANNELS_TABLE = 'channels'
 
+
 # Read messages from stdin
 cmdline = readline.createInterface {
   input:  process.stdin
   output: process.stdout
 }
-cmdline.setPrompt('')
+cmdline.setPrompt ''
+
 
 # The sockets and sessions of the clients
 sockets = {}
 sessions = {}
 channels = [ "general" ]
 
+
 # A dirty fix to get the sessionid when you have the socketid
 sessionid_by_socketid = {}
+
 
 # The server user to send messages as
 SERVER_USER = {
@@ -88,8 +99,21 @@ SERVER_USER = {
 db = undefined
 
 
+createTexture = (type, color) ->
+  unless type == "hair" or type == "tail"
+    console.log "No such type of texture"
+    return
+
+  unless color.length == 6
+    console.log "No support for non-RGB colors now (`[0-9a-f]{6}` only)"
+    return
+
+  cmd = "./Painter.jar 'www/images/textures/#{type}.png' '##{color}'"
+
+
+
 connectDatabase = ->
-  console.log "[DATABASE]".black.bgYellow + " Connecting to database..."
+  console.log "[DATABASE]".c_INFO + " Connecting to database..."
   db = mysql.createConnection db_config
 
   db.connect (err) ->
@@ -99,11 +123,11 @@ connectDatabase = ->
 
       throw err
     else
-      console.log "[DATABASE]".black.bgGreen + " Connected"
+      console.log "[DATABASE]".c_OK + " Connected"
 
   db.on 'error', (err) ->
     if err.code == 'PROTOCOL_CONNECTION_LOST'
-      console.log "[DATABASE]".black.bgRed + " Lost Connection! Reconnecting..."
+      console.log "[DATABASE]".c_ERR + " Lost Connection! Reconnecting..."
       # Try reconnecting
       setTimeout connectDatabase, 1000
     else
@@ -229,7 +253,7 @@ postlogin = (socket, user) ->
   while sessionid=='' or sessions[sessionid] isnt undefined
     sessionid = Base64.encode "#{Math.random() * 1e10}"
 
-  console.log "[ SESSID ]".black.bgGreen + " Assigned '#{sessionid}' to user '#{user.name}'"
+  console.log "[ SESSID ]".c_INFO + " Assigned '#{sessionid}' to user '#{user.name}'"
 
   # Set session ID
   sessions[sessionid] = {
@@ -289,7 +313,7 @@ receiveMessage = (socket, user, message) ->
   if message.length < 1
     return
 
-  console.log "[  CHAT  ]".black.bgCyan + " #{user.name}:".bold + " #{message}"
+  console.log "[  CHAT  ]".c_CHAT + " #{user.name}:".bold + " #{message}"
 
 
   unless parseCommand message, user, socket
@@ -365,12 +389,12 @@ io.sockets.on 'connection', (socket) ->
   if ip == "127.0.0.1"
     ip = "localhost"
 
-  console.log "[ CONNEC ]".black.bgGreen + " #{ip} connected with socket ID '#{socketid}'"
+  console.log "[ CONNEC ]".c_INFO + " #{ip} connected with socket ID '#{socketid}'"
 
 
   socket.on 'register', (data) ->
     if data is undefined
-      console.log "[REGISTER]".black.bgRed + " #{ip} : No data received"
+      console.log "[REGISTER]".c_ERR + " #{ip} : No data received"
 
       socket.emit 'register-failed', {
         error: "No data received"
@@ -384,7 +408,7 @@ io.sockets.on 'connection', (socket) ->
       type = 'normal'
 
       if username is undefined or password is undefined
-        console.log "[REGISTER]".black.bgRed + " #{ip} : Username/password undefined"
+        console.log "[REGISTER]".c_ERR + " #{ip} : Username/password undefined"
 
         socket.emit 'register-failed', {
           error: "Username or password undefined"
@@ -396,7 +420,7 @@ io.sockets.on 'connection', (socket) ->
       regex = /^[a-zA-Z0-9_]{2,64}$/
 
       unless (regex.test username) and (password.length >= 4)
-        console.log "[REGISTER]".black.bgRed + " #{ip} : Username/password don't match requirements!"
+        console.log "[REGISTER]".c_ERR + " #{ip} : Username/password don't match requirements!"
 
         socket.emit 'register-failed', {
           error: "Username/password don't match requirements!"
@@ -404,11 +428,11 @@ io.sockets.on 'connection', (socket) ->
 
         return
 
-      console.log "[REGISTER]".black.bgYellow + " #{ip} : Registration request for user '#{username}'"
+      console.log "[REGISTER]".c_INFO + " #{ip} : Registration request for user '#{username}'"
 
 
       if db is undefined
-        console.log "[REGISTER]".black.bgRed + " DATABASE UNDEFINED!"
+        console.log "[REGISTER]".c_ERR + " DATABASE UNDEFINED!"
 
         socket.emit 'register-failed', {
           error: "Internal error. Please try again later"
@@ -422,7 +446,7 @@ io.sockets.on 'connection', (socket) ->
           throw err
 
         if data.length > 0
-          console.log "[REGISTER]".black.bgRed + " #{ip} : User '#{username}' already exists with ID '#{data[0].id}'"
+          console.log "[REGISTER]".c_ERR + " #{ip} : User '#{username}' already exists with ID '#{data[0].id}'"
 
           socket.emit 'register-failed', {
             error: "Username already exists"
@@ -436,7 +460,7 @@ io.sockets.on 'connection', (socket) ->
 
 
           if db is undefined
-            console.log "[REGISTER]".black.bgRed + " DATABASE UNDEFINED!"
+            console.log "[REGISTER]".c_ERR + " DATABASE UNDEFINED!"
 
             socket.emit 'register-failed', {
               error: "Internal error. Please try again later"
@@ -448,7 +472,7 @@ io.sockets.on 'connection', (socket) ->
             if err
               throw err
 
-            console.log "[REGISTER]".black.bgGreen + " #{ip} : Registration for user '#{username}' completed"
+            console.log "[REGISTER]".c_OK + " #{ip} : Registration for user '#{username}' completed"
 
             socket.emit 'register-complete', {
               username: username
@@ -457,7 +481,7 @@ io.sockets.on 'connection', (socket) ->
 
   socket.on 'login', (data) ->
     if data is undefined
-      console.log "[ LOG-IN ]".black.bgRed + " #{ip} : No data received"
+      console.log "[ LOG-IN ]".c_ERR + " #{ip} : No data received"
 
       socket.emit 'login-failed', {
         error: "No data received"
@@ -470,7 +494,7 @@ io.sockets.on 'connection', (socket) ->
       password = data.password
 
       if username is undefined or password is undefined
-        console.log "[ LOG-IN ]".black.bgRed + " #{ip} : Username/password undefined!"
+        console.log "[ LOG-IN ]".c_ERR + " #{ip} : Username/password undefined!"
 
         socket.emit 'login-failed', {
           error: "Username or password undefined"
@@ -481,7 +505,7 @@ io.sockets.on 'connection', (socket) ->
       regex = /^[a-zA-Z0-9_]{2,64}$/
 
       unless (regex.test username) and (password.length >= 4)
-        console.log "[ LOG-IN ]".black.bgRed + " #{ip} : Username/password don't match requirements!"
+        console.log "[ LOG-IN ]".c_ERR + " #{ip} : Username/password don't match requirements!"
 
         socket.emit 'login-failed', {
           error: "Username/password don't match requirements!"
@@ -489,11 +513,11 @@ io.sockets.on 'connection', (socket) ->
 
         return
 
-      console.log "[ LOG-IN ]".black.bgYellow + " #{ip} : Login request for user '#{username}'"
+      console.log "[ LOG-IN ]".c_INFO + " #{ip} : Login request for user '#{username}'"
 
 
       if db is undefined
-        console.log "[ LOG-IN ]".black.bgRed + " DATABASE UNDEFINED!"
+        console.log "[ LOG-IN ]".c_ERR + " DATABASE UNDEFINED!"
 
         socket.emit 'login-failed', {
           error: "Internal error. Please try again later"
@@ -506,7 +530,7 @@ io.sockets.on 'connection', (socket) ->
           throw err
 
         if data.length < 1
-          console.log "[ LOG-IN ]".black.bgRed + " #{ip} : User '#{username}' not found"
+          console.log "[ LOG-IN ]".c_ERR + " #{ip} : User '#{username}' not found"
 
           socket.emit 'login-failed', {
             error: "Username/password incorrect!"
@@ -523,7 +547,7 @@ io.sockets.on 'connection', (socket) ->
             throw err
 
           unless verified
-            console.log "[ LOG-IN ]".black.bgRed + " #{ip} : User '#{username}' with id #{id} failed to login - hash mismatch"
+            console.log "[ LOG-IN ]".c_ERR + " #{ip} : User '#{username}' with id #{id} failed to login - hash mismatch"
 
             socket.emit 'login-failed', {
               error: "Username/password incorrect!"
@@ -531,7 +555,7 @@ io.sockets.on 'connection', (socket) ->
 
             return
 
-          console.log "[ LOG-IN ]".black.bgGreen + " #{ip} : User '#{username}' logged in"
+          console.log "[ LOG-IN ]".c_OK + " #{ip} : User '#{username}' logged in"
 
           # Get user permissions and type
           channel_perms = data[0].channel_perms
@@ -550,29 +574,29 @@ io.sockets.on 'connection', (socket) ->
 
   socket.on 'client-send-message', (data) ->
     if data is undefined
-      console.log "[  MESG  ]".black.bgRed + " #{ip} : No data received"
+      console.log "[  MESG  ]".c_ERR + " #{ip} : No data received"
       return
 
     message = data.message
 
     if message is undefined
-      console.log "[  MESG  ]".black.bgRed + " #{ip} : No message received"
+      console.log "[  MESG  ]".c_ERR + " #{ip} : No message received"
       return
 
     sessionid = data.sessionid
 
     if sessionid is undefined
-      console.log "[  MESG  ]".black.bgRed + " #{ip} : No session ID received"
+      console.log "[  MESG  ]".c_ERR + " #{ip} : No session ID received"
       return
 
     if sessions[sessionid] is undefined
-      console.log "[  MESG  ]".black.bgRed + " #{ip} : Session ID '#{data.sessionid}' not found in sessions"
+      console.log "[  MESG  ]".c_ERR + " #{ip} : Session ID '#{data.sessionid}' not found in sessions"
       return
 
     user = sessions[sessionid].user
 
     if user is undefined
-      console.log "[  MESG  ]".black.bgRed + " #{ip} : Session ID #{data.sessionid} exists, but no user is associated with it?"
+      console.log "[  MESG  ]".c_ERR + " #{ip} : Session ID #{data.sessionid} exists, but no user is associated with it?"
       return
 
     receiveMessage socket, user, message
@@ -585,14 +609,15 @@ io.sockets.on 'connection', (socket) ->
     if sessionid isnt undefined
       user = sessions[sessionid].user
 
-      console.log "[  CHAT  ]".black.bgCyan + " #{ip} : #{user.name} left the game."
+      console.log "[  CHAT  ]".c_CHAT + " #{ip} : #{user.name} left the game."
       sendMessageAs SERVER_USER, "<span class='user #{user.type}'>#{user.name}</span> left the game."
-      console.log "[ LOGOUT ]".black.bgRed + " #{ip} : #{user.name} logged out"
+
+      console.log "[ LOGOUT ]".c_ERR + " #{ip} : #{user.name} logged out"
 
       delete sessions[sessionid]
 
     else
-      console.log "[ DISCON ]".black.bgRed + " Non-logged-in client with socket ID '#{socketid}' has disconnected"
+      console.log "[ DISCON ]".c_ERR + " Non-logged-in client with socket ID '#{socketid}' has disconnected"
 
     delete sockets[socketid]
     delete sessionid_by_socketid[socketid]
@@ -615,4 +640,4 @@ connectDatabase()
 
 # Start server
 http.listen PORT, ->
-  console.log "[  INFO  ]".black.bgGreen + " Server started on port #{PORT}!"
+  console.log "[  INFO  ]".c_OK + " Server started on port #{PORT}!"
