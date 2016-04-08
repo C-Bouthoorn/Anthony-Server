@@ -1,312 +1,255 @@
 util = require('util')
 
+@tasks = []
+@args = []
+
+
+addTask = (func) ->
+  @tasks.push [
+    [ util.inspect @args ],
+
+    func
+  ]
+
+
 doCommands = (message, user, socket) ->
   unless message.startsWith '/'
     return []
 
+  @tasks = []
+
   firstspace = message.search /\s|$/
   command = message.substring 0, firstspace
-  args = message.substring(firstspace+1).split ' '
+  @args = message.substring(firstspace+1).split ' '
 
-  tasks = []
 
   noperms = () ->
-    socket.emit 'client-receive-message', {
-      user: SERVER_USER
-      message: "You don't have the right permissions to use this command!"
-    }
+    sendServerMessageTo socket, "You don't have the right permissions to use this command!"
 
 
 
   # Styles
   switch command
+
+    when '/debug'
+      addTask (args) ->
+        type = args[0]
+        color = args[1]
+
+        createTexture type, color
+
+
     when '/fur'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        color = args[0]
 
-        (args) ->
-          `var color`
+        console.log "[PONY_CMD]".c_CHAT + " Set fur color #{color} for user #{user.name}"
 
-          color = args[0]
-
-          console.log "[PONY_CMD]".black.bgCyan + " Set fur color #{color} for user #{user.name}"
-      ]
 
     when '/mane'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        color = args[0]
 
-        (args) ->
-          `var color`
+        console.log "[PONY_CMD]".c_CHAT + " Set mane color #{color} for user #{user.name}"
 
-          color = args[0]
-
-          console.log "[PONY_CMD]".black.bgCyan + " Set mane color #{color} for user #{user.name}"
-      ]
 
     when '/tailstyle'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        style = args[0]
 
-        (args) ->
-          `var style`
+        console.log "[PONY_CMD]".c_CHAT + " Set tail style #{style} for user #{user.name}"
 
-          style = args[0]
-
-          console.log "[PONY_CMD]".black.bgCyan + " Set tail style #{style} for user #{user.name}"
-      ]
 
     when '/manestyle'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        style = args[0]
 
-        (args) ->
-          `var style`
+        console.log "[PONY_CMD]".c_CHAT + " Set mane style #{style} for user #{user.name}"
 
-          style = args[0]
-
-          console.log "[PONY_CMD]".black.bgCyan + " Set mane style #{style} for user #{user.name}"
-      ]
 
     when '/fullstyle'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        style = args[0]
 
-        (args) ->
-          `var style`
-
-          style = args[0]
-
-          console.log "[PONY_CMD]".black.bgCyan + " Set style #{style} for user #{user.name}"
-      ]
+        console.log "[PONY_CMD]".c_CHAT + " Set style #{style} for user #{user.name}"
 
 
     # Teleporting
     when '/spawn'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        console.log "[PONY_CMD]".c_CHAT + " User #{user.name} teleported to spawn"
 
-        (args) ->
-
-          console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to spawn"
-      ]
 
     when '/sethome'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        console.log "[PONY_CMD]".c_CHAT + " Set home for user #{user.name}"
 
-        (args) ->
-
-          console.log "[PONY_CMD]".black.bgCyan + " Set home for user #{user.name}"
-      ]
 
     when '/home'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        console.log "[PONY_CMD]".c_CHAT + " User #{user.name} teleported to home"
 
-        (args) ->
-
-          console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to home"
-      ]
 
     when '/teleport'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        name = args[0]
 
-        (args) ->
-          `var name`
-
-          name = args[0]
-
-          console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to #{name}"
-      ]
+        console.log "[PONY_CMD]".c_CHAT + " User #{user.name} teleported to #{name}"
 
 
     # Channels
     when '/create'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        name = args[0]
 
-        (args) ->
-          `var name`
+        regex = /^[a-zA-Z0-9_]{2,64}$/
+        unless regex.test name
+          console.log "[  CHNL  ]".c_ERR + " Channel doesn't match requirements"
 
-          name = args[0]
+          sendServerMessageTo socket, "Channel name doesn't match requirements"
+          return
 
-          regex = /^[a-zA-Z0-9_]{2,64}$/
-          unless regex.test name
-            console.log "[  CHNL  ]".black.bgRed + " Channel doesn't match requirements"
+        console.log "[  CHNL  ]".c_OK + " Create channel #{name} for user #{user.name}"
 
-            socket.emit 'client-receive-message', {
-              user: SERVER_USER
-              message: "Channel name doesn't match requirements"
-            }
+        if channels.includes name
+          console.log "[  CHNL  ]".c_ERR + " Channel already exists!"
 
-            return
-
-          console.log "[  CHNL  ]".black.bgGreen + " Create channel #{name} for user #{user.name}"
-
-          if channels.includes name
-            console.log "[  CHNL  ]".black.bgRed + " Channel already exists!"
-
-            socket.emit 'client-receive-message', {
-              user: SERVER_USER
-              message: "Channel already exists! Use <b>/join #{name}</b> to join it"
-            }
-
-            return
+          sendServerMessageTo socket, "Channel already exists! Use <b>/join #{name}</b> to join it"
+          return
 
 
-          channels.push name
+        channels[name] = []
 
-          user.channel_perms.push name
+        user.channel_perms.push name
 
 
-          if db is undefined
-            console.log "[  CHNL  ]".black.bgRed + " DATABASE UNDEFINED!"
-            return
+        if db is undefined
+          console.log "[  CHNL  ]".c_ERR + " DATABASE UNDEFINED!"
+          return
 
-          qq = "UPDATE #{USER_TABLE} SET channel_perms=#{db.escape user.channel_perms.join ';'} WHERE id=#{user.id};"
-          db.query qq, (err, data) ->
-            if err then throw err
+        qq = "UPDATE #{USER_TABLE} SET channel_perms=#{db.escape user.channel_perms.join ';'} WHERE id=#{user.id};"
+        db.query qq, (err, data) ->
+          if err then throw err
 
-          qq = "INSERT INTO #{CHANNELS_TABLE} (name) VALUES (#{db.escape name});"
-          db.query qq, (err, data) ->
-            if err then throw err
+        # NOTE: User hasn't joined yet!
+        qq = "INSERT INTO #{CHANNELS_TABLE} (name) VALUES (#{db.escape name});"
+        db.query qq, (err, data) ->
+          if err then throw err
 
-          console.log "[  CHNL  ]".black.bgGreen + " Channel #{name} created"
+        console.log "[  CHNL  ]".c_OK + " Channel #{name} created"
 
-          socket.emit 'client-receive-message', {
-            user: SERVER_USER
-            message: "Channel created. Use <b>/join #{name}</b> to join it"
-          }
-      ]
+        sendServerMessageTo socket, "Channel created. Use <b>/join #{name}</b> to join it"
+
 
     when '/join'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        `var name`
 
-        (args) ->
-          `var name`
+        name = args[0]
 
-          name = args[0]
+        unless user.channel_perms.includes name
+          console.log "[  CHNL  ]".c_ERR + " User #{user.name} doesn't have permission to join channel #{name}!"
 
-          unless user.channel_perms.split(';').includes name
-            console.log "[  CHNL  ]".black.bgRed + " User #{user.name} doesn't have permission to join channel #{name}!"
+          sendServerMessageTo socket, "You don't have permission to join this channel"
 
-            socket.emit 'client-receive-message', {
-              user: SERVER_USER
-              message: "You don't have permission to join this channel"
-            }
-
-            return
+          return
 
 
-          unless channels.includes name
-            console.log "[  CHNL  ]".black.bgRed + " Channel #{name} doesn't exist!"
+        unless channels[name]?
+          console.log "[  CHNL  ]".c_ERR + " Channel #{name} doesn't exist!"
 
-            socket.emit 'client-receive-message', {
-              user: SERVER_USER
-              message: "That channel doesn't exist"
-            }
-
-            return
+          sendServerMessageTo socket, "That channel doesn't exist"
+          return
 
 
-          user.channels.push name
+        user.channels.push name
 
-          console.log "[  CHNL  ]".black.bgGreen + " User #{user.name} joined channel #{name}"
+        unless channels[name].includes user.id
+          channels[name].push user.id
 
-          socket.emit 'client-receive-message', {
-            user: SERVER_USER
-            message: "Joined channel"
-          }
 
-          socket.emit 'setchannels', {
-            channels: user.channels
-          }
-      ]
+        if db is undefined
+          console.log "[  CHNL  ]".c_ERR + " DATABASE UNDEFINED!"
+          return
+
+        qq = "UPDATE #{CHANNELS_TABLE} SET joined=#{db.escape channels[name].join ';'};"
+        db.query qq, (err, data) ->
+          if err then throw err
+
+        console.log "[  CHNL  ]".c_OK + " User #{user.name} joined channel #{name}"
+
+        sendServerMessageTo socket, "Joined channel"
+
+        socket.emit 'setchannels', {
+          channels: user.channels
+        }
+
 
     when '/invite'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        username = args[0]
+        name = args[1]
 
-        (args) ->
-          `var username, name`
-
-          username = args[0]
-          name = args[1]
-      ]
 
     when '/leave'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        name = args[0]
+        console.log "[  CHNL  ]".c_ERR + " user #{user.name} leaves channel #{name}"
 
-        (args) ->
-          `var name`
+        if name == 'general'
+          sendServerMessageTo socket, "One can't leave the general channel"
+          return
 
-          name = args[0]
-          console.log "[  CHNL  ]".black.bgRed + "user #{user.name} left channel #{name}"
+        unless user.channels.includes name
+          console.log "[  CHNL  ]".c_ERR + " User #{user.name} isn't in channel #{name}!"
 
-          unless user.channels.includes name
-            console.log "[  CHNL  ]".black.bgRed + "User #{user.name} isn't in channel #{name}!"
-
-            socket.emit 'client-receive-message', {
-              user: SERVER_USER
-              message: "You aren't in that channel"
-            }
-
-            return
+          sendServerMessageTo socket, "You are not in that channel"
+          return
 
 
-          user.channels.remove name
+        user.channels.remove name
+        channels[name].remove user.id
 
-          socket.emit 'setchannels', {
-            channels: user.channels
-          }
+        if db is undefined
+          console.log "[  CHNL  ]".c_ERR + " DATABASE UNDEFINED!"
+          return
 
-          socket.emit 'client-receive-message', {
-            user: SERVER_USER
-            message: "Succesfully left channel!"
-          }
-      ]
+        qq = "UPDATE #{CHANNELS_TABLE} SET joined=#{db.escape channels[name].join ';'};"
+        db.query qq, (err, data) ->
+          if err then throw err
+
+        socket.emit 'setchannels', {
+          channels: user.channels
+        }
+
+        sendServerMessageTo socket, "Succesfully left channel!"
 
 
     # Minigames
     when '/tag'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        `var tag`
 
-        (args) ->
-          `var tag`
+        tag = args[0]
 
-          tag = args[0]
-
-          console.log "[MINIGAME]".black.bgMagenta + "user #{user.name} joined the tag!"
-      ]
+        console.log "[MINIGAME]".black.bgMagenta + "user #{user.name} joined the tag!"
 
 
     # Other
     when '/report'
-      tasks.push [
-        [ util.inspect args ],
+      addTask (args) ->
+        `var name, reason`
 
-        (args) ->
-          `var name, reason`
+        name = args[0]
+        reason = args.splice(1).join(' ')
 
-          name = args[0]
-          reason = args.splice(1).join(' ')
+        console.log "[ REPORT ]".red.bgWhite+" User "+"#{user.name}".underline+" reported "+"#{name}".underline+" for "+"#{reason}"
 
-          console.log "[ REPORT ]".red.bgWhite + " User #{user.name} reported #{name} for " + "#{reason}".underline
-
-          socket.emit 'client-receive-message', {
-            user: SERVER_USER
-            message: "Thank you for reporting! We will look into it. Note, however, that false reports might result in a ban!"
-          }
-      ]
+        sendServerMessageTo socket, "Thank you for reporting! We will look into it. Note, however, that false reports might result in a ban!"
 
 
     when '/rules'
-      tasks.push () ->
+      addTask () ->
         socket.emit 'client-receive-message', {
           user: SERVER_USER
           message: """
@@ -323,7 +266,7 @@ The rules are:
 
 
     when '/help'
-      tasks.push () ->
+      addTask () ->
         socket.emit 'client-receive-message', {
           user: SERVER_USER
           message: """
@@ -364,7 +307,7 @@ The rules are:
 
 
     when '/online'
-      tasks.push () ->
+      addTask () ->
 
         # Get online users
         users = []
@@ -394,10 +337,7 @@ The rules are:
             return -1
 
 
-        socket.emit 'client-receive-message', {
-          user: SERVER_USER
-          message: "Users online(#{users.length}): #{(u.name for u in users).join ", "}"
-        }
+        sendServerMessageTo socket, "Users online(#{users.length}): #{(u.name for u in users).join ", "}"
 
 
     when '/kick'
@@ -405,35 +345,29 @@ The rules are:
 
       if (user.type == "server") or (user.name == targetname)
 
-        tasks.push [
-          [ util.inspect args ],
+        addTask (args) ->
+          `var targetname`
 
+          targetname = args[0]
 
+          # Get session ID by username
+          for sesid, ses of sessions
+            if ses.user is undefined
+              continue
 
-          ( args ) ->
+            if ses.user.name == targetname
+              targetsock = ses.socket
 
-            `var targetname`  # Scoping ffs
-            targetname = args[0]
+              # Relies on target to not check incoming messages...
+              targetsock.emit 'client-receive-message', {
+                user: SERVER_USER
+                message: "<script>removeUsernameCookie();location.href+='';</script>"
+              }
 
-            # Get session ID by username
-            for sesid, ses of sessions
-              if ses.user is undefined
-                continue
-
-              if ses.user.name == targetname
-                targetsock = ses.socket
-
-                # Relies on target to not check incoming messages...
-                targetsock.emit 'client-receive-message', {
-                  user: SERVER_USER
-                  message: "<script>removeUsernameCookie();location.href+='';</script>"
-                }
-
-                break
-        ]
+              break
 
       else
-        tasks.push noperms
+        addTask noperms
 
 
   return tasks

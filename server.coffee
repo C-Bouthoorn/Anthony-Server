@@ -7,7 +7,7 @@ app        = require('express')()
 http       = require('http').Server(app)
 io         = require('socket.io')(http)
 fs         = require('fs')
-exec       = require('child_process').exec
+child      = require('child_process')
 util       = require('util')
 mysql      = require('mysql')
 stamp      = require('console-stamp')
@@ -19,6 +19,7 @@ htmlencode = require('htmlencode')
 stamp console, {
   pattern: 'dd/mm/yyyy HH:MM:ss.l'
   label: false
+
   colors: {
     stamp:  [ 'blue', 'bold']  # Time
 
@@ -29,11 +30,10 @@ stamp console, {
   }
 }
 
-# Array includes
-require('./includes.js')
-
 require('coffee-script')  # Lets me require coffeescript files B-)
+
 doCommands = require('./commands.coffee')
+require('./patches.coffee')
 
 
 # Custom Base64 class for en- and decoding
@@ -108,8 +108,17 @@ createTexture = (type, color) ->
     console.log "No support for non-RGB colors now (`[0-9a-f]{6}` only)"
     return
 
-  cmd = "./Painter.jar 'www/images/textures/#{type}.png' '##{color}'"
 
+  p = child.spawn "./Painter.jar", ["www/images/textures/#{type}.png", "'#{color}'"]
+
+  out = (data) ->
+    data = (data+'').trim()
+
+    if data.length > 0
+      console.log data
+
+  p.stdout.on 'data', out
+  p.stderr.on 'data', out
 
 
 connectDatabase = ->
@@ -132,23 +141,6 @@ connectDatabase = ->
       setTimeout connectDatabase, 1000
     else
       throw err
-
-
-# Monkey patch hash loop
-Object.prototype.map = (callback) ->
-  for k of this
-    if Object.hasOwnProperty.call this, k
-      v = this[k]
-      callback k, v
-
-
-# Monkey Patch array to remove items
-Array.prototype.remove = (item) ->
-  index = this.indexOf item
-
-  if index >= 0
-    this.splice index, 1
-
 
 # Set paths for files
 FILES = {
@@ -242,6 +234,13 @@ sendMessageAs = (user, message) ->
       user: user
       message: message
     }
+
+
+sendServerMessageTo = (socket, message) ->
+  socket.emit 'client-receive-message', {
+    user: SERVER_USER
+    message: message
+  }
 
 
 # Called when a player succesfully logged in
@@ -558,7 +557,7 @@ io.sockets.on 'connection', (socket) ->
           console.log "[ LOG-IN ]".c_OK + " #{ip} : User '#{username}' logged in"
 
           # Get user permissions and type
-          channel_perms = data[0].channel_perms
+          channel_perms = data[0].channel_perms.split ';'
           usertype = data[0].type
 
           # No need to check, as it's from the DB, and we trust the DB (right?)
@@ -637,6 +636,16 @@ cmdline.on 'line', (message) ->
 
 # Connect to database
 connectDatabase()
+
+# Load all channels
+qq = "SELECT * FROM #{CHANNELS_TABLE};"
+db.query qq, (err, data) ->
+  if err
+    throw err
+
+  for chnl in data
+    console.log "Add #{chnl.name}"
+    channels[chnl.name] = chnl.joined.split ';'
 
 # Start server
 http.listen PORT, ->

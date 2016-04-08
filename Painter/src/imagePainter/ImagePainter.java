@@ -8,7 +8,11 @@ import javax.imageio.ImageIO;
 
 
 public class ImagePainter {
+	public static String VERSION = "v1.0";
+	
 	public ImagePainter(String[] args) {
+		System.out.println("ImagePainter " + VERSION);
+		
 		if ( args.length < 1 ) {
 			System.out.println("No filename specified");
 			return;
@@ -35,7 +39,10 @@ public class ImagePainter {
 		String base = filename.substring(0, lastdot);
 		String ext = filename.substring(lastdot+1);
 		
-		String newFilename = file.getAbsoluteFile().getParent() + "/converted/" + base + "-" + Integer.toHexString(newColor.getRGB() & 0xffffff) + "." + ext;
+		String hex = Integer.toHexString(newColor.getRGB() & 0xffffff);
+		while ( hex.length() < 6 ) hex = "00"+hex;
+		
+		String newFilename = file.getAbsoluteFile().getParent() + "/converted/" + base + "-" + hex + "." + ext;
 		File newFile = new File(newFilename);
 		
 		System.out.println(newFilename);
@@ -63,8 +70,8 @@ public class ImagePainter {
 						
 						// Convert color to match newColor
 						r = (int) Math.round( r/255.0 * newColor.getRed()   );
-						g = (int) Math.round( g/255.0 * newColor.getGreen() );
-						b = (int) Math.round( b/255.0 * newColor.getBlue()  );
+						g = (int) Math.round( r/255.0 * newColor.getGreen() );
+						b = (int) Math.round( r/255.0 * newColor.getBlue()  );
 						
 						c = new Color(r, g, b, newColor.getAlpha());
 					}

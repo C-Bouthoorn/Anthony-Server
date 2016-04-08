@@ -1,11 +1,11 @@
-`/*jshint jquery: true*///`
-`/*globals io:false, console:false, Cookies:false *///`
+`/*jshint jquery: true, browser: true, devel: true *///`
+`/*globals io:false, Cookies:false *///`
 
 'use strict'
 
 socket = null
 sessionid = null
-channels = []
+channels = [ "general" ]
 
 emojis = {
   ':)': "http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg"
