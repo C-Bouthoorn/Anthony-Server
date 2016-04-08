@@ -19,305 +19,297 @@ doCommands = (message, user, socket) ->
 
 
   # Styles
-  if command == '/fur'
-    tasks.push [
-      [ util.inspect args ],
+  switch command
+    when '/fur'
+      tasks.push [
+        [ util.inspect args ],
 
-      (args) ->
-        `var color`
+        (args) ->
+          `var color`
 
-        color = args[0]
+          color = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set fur color #{color} for user #{user.name}"
-    ]
+          console.log "[PONY_CMD]".black.bgCyan + " Set fur color #{color} for user #{user.name}"
+      ]
 
-  else if command == '/mane'
-    tasks.push [
-      [ util.inspect args ],
+    when '/mane'
+      tasks.push [
+        [ util.inspect args ],
 
-      (args) ->
-        `var color`
+        (args) ->
+          `var color`
 
-        color = args[0]
+          color = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set mane color #{color} for user #{user.name}"
-    ]
+          console.log "[PONY_CMD]".black.bgCyan + " Set mane color #{color} for user #{user.name}"
+      ]
 
-  else if command == '/tailstyle'
-    tasks.push [
-      [ util.inspect args ],
+    when '/tailstyle'
+      tasks.push [
+        [ util.inspect args ],
 
-      (args) ->
-        `var style`
+        (args) ->
+          `var style`
 
-        style = args[0]
+          style = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set tail style #{style} for user #{user.name}"
-    ]
+          console.log "[PONY_CMD]".black.bgCyan + " Set tail style #{style} for user #{user.name}"
+      ]
 
-  else if command == '/manestyle'
-    tasks.push [
-      [ util.inspect args ],
+    when '/manestyle'
+      tasks.push [
+        [ util.inspect args ],
 
-      (args) ->
-        `var style`
+        (args) ->
+          `var style`
 
-        style = args[0]
+          style = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set mane style #{style} for user #{user.name}"
-    ]
+          console.log "[PONY_CMD]".black.bgCyan + " Set mane style #{style} for user #{user.name}"
+      ]
 
-  else if command == '/fullstyle'
-    tasks.push [
-      [ util.inspect args ],
+    when '/fullstyle'
+      tasks.push [
+        [ util.inspect args ],
 
-      (args) ->
-        `var style`
+        (args) ->
+          `var style`
 
-        style = args[0]
+          style = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " Set style #{style} for user #{user.name}"
-    ]
-
-
-  # Teleporting
-  else if command == '/spawn'
-    tasks.push [
-      [ util.inspect args ],
-
-      (args) ->
-
-        console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to spawn"
-    ]
-
-  else if command == '/sethome'
-    tasks.push [
-      [ util.inspect args ],
-
-      (args) ->
-
-        console.log "[PONY_CMD]".black.bgCyan + " Set home for user #{user.name}"
-    ]
+          console.log "[PONY_CMD]".black.bgCyan + " Set style #{style} for user #{user.name}"
+      ]
 
 
-  else if command == '/home'
-    tasks.push [
-      [ util.inspect args ],
+    # Teleporting
+    when '/spawn'
+      tasks.push [
+        [ util.inspect args ],
 
-      (args) ->
+        (args) ->
 
-        console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to home"
-    ]
+          console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to spawn"
+      ]
+
+    when '/sethome'
+      tasks.push [
+        [ util.inspect args ],
+
+        (args) ->
+
+          console.log "[PONY_CMD]".black.bgCyan + " Set home for user #{user.name}"
+      ]
+
+    when '/home'
+      tasks.push [
+        [ util.inspect args ],
+
+        (args) ->
+
+          console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to home"
+      ]
+
+    when '/teleport'
+      tasks.push [
+        [ util.inspect args ],
+
+        (args) ->
+          `var name`
+
+          name = args[0]
+
+          console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to #{name}"
+      ]
 
 
-  else if command == '/teleport'
-    tasks.push [
-      [ util.inspect args ],
+    # Channels
+    when '/create'
+      tasks.push [
+        [ util.inspect args ],
 
-      (args) ->
-        `var name`
+        (args) ->
+          `var name`
 
-        name = args[0]
+          name = args[0]
 
-        console.log "[PONY_CMD]".black.bgCyan + " User #{user.name} teleported to #{name}"
-    ]
+          regex = /^[a-zA-Z0-9_]{2,64}$/
+          unless regex.test name
+            console.log "[  CHNL  ]".black.bgRed + " Channel doesn't match requirements"
+
+            socket.emit 'client-receive-message', {
+              user: SERVER_USER
+              message: "Channel name doesn't match requirements"
+            }
+
+            return
+
+          console.log "[  CHNL  ]".black.bgGreen + " Create channel #{name} for user #{user.name}"
+
+          if channels.includes name
+            console.log "[  CHNL  ]".black.bgRed + " Channel already exists!"
+
+            socket.emit 'client-receive-message', {
+              user: SERVER_USER
+              message: "Channel already exists! Use <b>/join #{name}</b> to join it"
+            }
+
+            return
 
 
-  # Channels
-  else if command == '/create'
-    tasks.push [
-      [ util.inspect args ],
+          channels.push name
 
-      (args) ->
-        `var name`
+          user.channel_perms.push name
 
-        name = args[0]
 
-        regex = /^[a-zA-Z0-9_]{2,64}$/
-        unless regex.test name
-          console.log "[  CHNL  ]".black.bgRed + " Channel doesn't match requirements"
+          if db is undefined
+            console.log "[  CHNL  ]".black.bgRed + " DATABASE UNDEFINED!"
+            return
+
+          qq = "UPDATE #{USER_TABLE} SET channel_perms=#{db.escape user.channel_perms.join ';'} WHERE id=#{user.id};"
+          db.query qq, (err, data) ->
+            if err then throw err
+
+          qq = "INSERT INTO #{CHANNELS_TABLE} (name) VALUES (#{db.escape name});"
+          db.query qq, (err, data) ->
+            if err then throw err
+
+          console.log "[  CHNL  ]".black.bgGreen + " Channel #{name} created"
 
           socket.emit 'client-receive-message', {
             user: SERVER_USER
-            message: "Channel name doesn't match requirements"
+            message: "Channel created. Use <b>/join #{name}</b> to join it"
           }
+      ]
 
-          return
+    when '/join'
+      tasks.push [
+        [ util.inspect args ],
 
-        console.log "[  CHNL  ]".black.bgGreen + " Create channel #{name} for user #{user.name}"
+        (args) ->
+          `var name`
 
-        if channels.includes name
-          console.log "[  CHNL  ]".black.bgRed + " Channel already exists!"
+          name = args[0]
+
+          unless user.channel_perms.split(';').includes name
+            console.log "[  CHNL  ]".black.bgRed + " User #{user.name} doesn't have permission to join channel #{name}!"
+
+            socket.emit 'client-receive-message', {
+              user: SERVER_USER
+              message: "You don't have permission to join this channel"
+            }
+
+            return
+
+
+          unless channels.includes name
+            console.log "[  CHNL  ]".black.bgRed + " Channel #{name} doesn't exist!"
+
+            socket.emit 'client-receive-message', {
+              user: SERVER_USER
+              message: "That channel doesn't exist"
+            }
+
+            return
+
+
+          user.channels.push name
+
+          console.log "[  CHNL  ]".black.bgGreen + " User #{user.name} joined channel #{name}"
 
           socket.emit 'client-receive-message', {
             user: SERVER_USER
-            message: "Channel already exists! Use <b>/join #{name}</b> to join it"
+            message: "Joined channel"
           }
 
-          return
+          socket.emit 'setchannels', {
+            channels: user.channels
+          }
+      ]
+
+    when '/invite'
+      tasks.push [
+        [ util.inspect args ],
+
+        (args) ->
+          `var username, name`
+
+          username = args[0]
+          name = args[1]
+      ]
+
+    when '/leave'
+      tasks.push [
+        [ util.inspect args ],
+
+        (args) ->
+          `var name`
+
+          name = args[0]
+          console.log "[  CHNL  ]".black.bgRed + "user #{user.name} left channel #{name}"
+
+          unless user.channels.includes name
+            console.log "[  CHNL  ]".black.bgRed + "User #{user.name} isn't in channel #{name}!"
+
+            socket.emit 'client-receive-message', {
+              user: SERVER_USER
+              message: "You aren't in that channel"
+            }
+
+            return
 
 
-        channels.push name
+          user.channels.remove name
 
-        user.channel_perms.push name
+          socket.emit 'setchannels', {
+            channels: user.channels
+          }
+
+          socket.emit 'client-receive-message', {
+            user: SERVER_USER
+            message: "Succesfully left channel!"
+          }
+      ]
 
 
-        if db is undefined
-          console.log "[  CHNL  ]".black.bgRed + " DATABASE UNDEFINED!"
-          return
+    # Minigames
+    when '/tag'
+      tasks.push [
+        [ util.inspect args ],
 
-        qq = "UPDATE #{USER_TABLE} SET channel_perms=#{db.escape user.channel_perms.join ';'} WHERE id=#{user.id};"
-        db.query qq, (err, data) ->
-          if err then throw err
+        (args) ->
+          `var tag`
 
-        qq = "INSERT INTO #{CHANNELS_TABLE} (name) VALUES (#{db.escape name});"
-        db.query qq, (err, data) ->
-          if err then throw err
+          tag = args[0]
 
-        console.log "[  CHNL  ]".black.bgGreen + " Channel #{name} created"
+          console.log "[MINIGAME]".black.bgMagenta + "user #{user.name} joined the tag!"
+      ]
 
+
+    # Other
+    when '/report'
+      tasks.push [
+        [ util.inspect args ],
+
+        (args) ->
+          `var name, reason`
+
+          name = args[0]
+          reason = args.splice(1).join(' ')
+
+          console.log "[ REPORT ]".red.bgWhite + " User #{user.name} reported #{name} for " + "#{reason}".underline
+
+          socket.emit 'client-receive-message', {
+            user: SERVER_USER
+            message: "Thank you for reporting! We will look into it. Note, however, that false reports might result in a ban!"
+          }
+      ]
+
+
+    when '/rules'
+      tasks.push () ->
         socket.emit 'client-receive-message', {
           user: SERVER_USER
-          message: "Channel created. Use <b>/join #{name}</b> to join it"
-        }
-    ]
-
-
-  else if command == '/join'
-    tasks.push [
-      [ util.inspect args ],
-
-      (args) ->
-        `var name`
-
-        name = args[0]
-
-        unless user.channel_perms.split(';').includes name
-          console.log "[  CHNL  ]".black.bgRed + " User #{user.name} doesn't have permission to join channel #{name}!"
-
-          socket.emit 'client-receive-message', {
-            user: SERVER_USER
-            message: "You don't have permission to join this channel"
-          }
-
-          return
-
-
-        unless channels.includes name
-          console.log "[  CHNL  ]".black.bgRed + " Channel #{name} doesn't exist!"
-
-          socket.emit 'client-receive-message', {
-            user: SERVER_USER
-            message: "That channel doesn't exist"
-          }
-
-          return
-
-
-        user.channels.push name
-
-        console.log "[  CHNL  ]".black.bgGreen + " User #{user.name} joined channel #{name}"
-
-        socket.emit 'client-receive-message', {
-          user: SERVER_USER
-          message: "Joined channel"
-        }
-
-        socket.emit 'setchannels', {
-          channels: user.channels
-        }
-    ]
-
-
-  else if command == '/invite'
-    tasks.push [
-      [ util.inspect args ],
-
-      (args) ->
-        `var username, name`
-
-        username = args[0]
-        name = args[1]
-
-
-
-
-    ]
-
-
-  else if command == '/leave'
-    tasks.push [
-      [ util.inspect args ],
-
-      (args) ->
-        `var name`
-
-        name = args[0]
-        console.log "[  CHNL  ]".black.bgRed + "user #{user.name} left channel #{name}"
-
-        unless user.channels.includes name
-          console.log "[  CHNL  ]".black.bgRed + "User #{user.name} isn't in channel #{name}!"
-
-          socket.emit 'client-receive-message', {
-            user: SERVER_USER
-            message: "You aren't in that channel"
-          }
-
-          return
-
-
-        user.channels.remove name
-
-        socket.emit 'setchannels', {
-          channels: user.channels
-        }
-
-        socket.emit 'client-receive-message', {
-          user: SERVER_USER
-          message: "Succesfully left channel!"
-        }
-    ]
-
-
-  # Minigames
-  else if command == '/tag'
-    tasks.push [
-      [ util.inspect args ],
-
-      (args) ->
-        `var tag`
-
-        tag = args[0]
-
-        console.log "[MINIGAME]".black.bgMagenta + "user #{user.name} joined the tag!"
-    ]
-
-
-  # Other
-  else if command == '/report'
-    tasks.push [
-      [ util.inspect args ],
-
-      (args) ->
-        `var name, reason`
-
-        name = args[0]
-        reason = args.splice(1).join(' ')
-
-        console.log "[ REPORT ]".red.bgWhite + " User #{user.name} reported #{name} for " + "#{reason}".underline
-
-        socket.emit 'client-receive-message', {
-          user: SERVER_USER
-          message: "Thank you for reporting! We will look into it. Note, however, that false reports might result in a ban!"
-        }
-    ]
-
-
-  else if command == '/rules'
-    tasks.push () ->
-      socket.emit 'client-receive-message', {
-        user: SERVER_USER
-        message: """
+          message: """
 The rules are:
 1. Don't swear
 2. Don't swear
@@ -327,121 +319,121 @@ The rules are:
 6. Please
 7. Oh, and follow the rules
 """.replace /\n/g, '<br>'
-      }
+        }
 
 
-  else if command == '/help'
-    tasks.push () ->
-      socket.emit 'client-receive-message', {
-        user: SERVER_USER
-        message: """
-<b>/fur [color]:</b>
-Changes your fur to indicated color. e.g. /fur red or /fur #ff0000
-<b>/mane [color]:</b>
-Changes your mane to indicated color.
-<b>/tailstyle [style]:</b>
-Changes your tail to indicated style. e.g. /tailstyle derpy or /tailstyle applejack
-<b>/manestyle [style]:</b>
-Changes your mane to indicated style.
-<b>/fullstyle [style]:</b>
-Changes your mane and tail to indicated style.
-<b>/online:</b>
-Shows you who is online.
-<b>/spawn:</b>
-Teleports you to the spawn.
-<b>/sethome:</b>
-Sets your private spawn point to your current location.
-<b>/home:</b>
-Teleports you to your private spawn point.
-<b>/tag:</b>
-Join/leave the tag.
-<b>/rules:</b>
-Displays the rules.
-<b>/create [name]:</b>
-Creates a chatchannel.
-<b>/join [name]:</b>
-Joins a chatchannel.
-<b>/leave [name]:</b>
-Leaves a chatchannel. (You cannot leave certain default channels)
-<b>/teleport [name]:</b>
-Teleports you to a player.
-<b>/report [name] [reason]:</b>
-Report a player. Troll reports will be punished!
-""".replace /\n/g, '<br>'
-      }
+    when '/help'
+      tasks.push () ->
+        socket.emit 'client-receive-message', {
+          user: SERVER_USER
+          message: """
+  <b>/fur [color]:</b>
+  Changes your fur to indicated color. e.g. /fur red or /fur #ff0000
+  <b>/mane [color]:</b>
+  Changes your mane to indicated color.
+  <b>/tailstyle [style]:</b>
+  Changes your tail to indicated style. e.g. /tailstyle derpy or /tailstyle applejack
+  <b>/manestyle [style]:</b>
+  Changes your mane to indicated style.
+  <b>/fullstyle [style]:</b>
+  Changes your mane and tail to indicated style.
+  <b>/online:</b>
+  Shows you who is online.
+  <b>/spawn:</b>
+  Teleports you to the spawn.
+  <b>/sethome:</b>
+  Sets your private spawn point to your current location.
+  <b>/home:</b>
+  Teleports you to your private spawn point.
+  <b>/tag:</b>
+  Join/leave the tag.
+  <b>/rules:</b>
+  Displays the rules.
+  <b>/create [name]:</b>
+  Creates a chatchannel.
+  <b>/join [name]:</b>
+  Joins a chatchannel.
+  <b>/leave [name]:</b>
+  Leaves a chatchannel. (You cannot leave certain default channels)
+  <b>/teleport [name]:</b>
+  Teleports you to a player.
+  <b>/report [name] [reason]:</b>
+  Report a player. Troll reports will be punished!
+  """.replace /\n/g, '<br>'
+        }
 
 
-  else if command == '/online'
-    tasks.push () ->
+    when '/online'
+      tasks.push () ->
 
-      # Get online users
-      users = []
+        # Get online users
+        users = []
 
-      for _,s of sessions
-        unless s.user is undefined
-          users.push s.user
+        for _,s of sessions
+          unless s.user is undefined
+            users.push s.user
 
 
-      # Sort by type
-      users.sort (a, b) ->
-        # "admin" / "mod" / "normal"
+        # Sort by type
+        users.sort (a, b) ->
+          # "admin" / "mod" / "normal"
 
-        typea = a.type
-        typeb = b.type
+          typea = a.type
+          typeb = b.type
 
-        if typea == typeb
-          if a.id > b.id
+          if typea == typeb
+            if a.id > b.id
+              return 1
+            else
+              return -1
+
+          else if ( typea == "admin" ) or ( typea == "mod" and typeb == "normal" )
             return 1
+
           else
             return -1
 
-        else if ( typea == "admin" ) or ( typea == "mod" and typeb == "normal" )
-          return 1
 
-        else
-          return -1
-
-
-      socket.emit 'client-receive-message', {
-        user: SERVER_USER
-        message: "Users online(#{users.length}): #{(u.name for u in users).join ", "}"
-      }
+        socket.emit 'client-receive-message', {
+          user: SERVER_USER
+          message: "Users online(#{users.length}): #{(u.name for u in users).join ", "}"
+        }
 
 
-  else if command == '/kick'
-    targetname = args[0]
+    when '/kick'
+      targetname = args[0]
 
-    if (user.type == "server") or (user.name == targetname)
+      if (user.type == "server") or (user.name == targetname)
 
-      tasks.push [
-        [ util.inspect args ],
+        tasks.push [
+          [ util.inspect args ],
 
 
 
-        ( args ) ->
+          ( args ) ->
 
-          `var targetname`  # Scoping ffs
-          targetname = args[0]
+            `var targetname`  # Scoping ffs
+            targetname = args[0]
 
-          # Get session ID by username
-          for sesid, ses of sessions
-            if ses.user is undefined
-              continue
+            # Get session ID by username
+            for sesid, ses of sessions
+              if ses.user is undefined
+                continue
 
-            if ses.user.name == targetname
-              targetsock = ses.socket
+              if ses.user.name == targetname
+                targetsock = ses.socket
 
-              # Relies on target to not check incoming messages...
-              targetsock.emit 'client-receive-message', {
-                user: SERVER_USER
-                message: "<script>removeUsernameCookie();location.href+='';</script>"
-              }
+                # Relies on target to not check incoming messages...
+                targetsock.emit 'client-receive-message', {
+                  user: SERVER_USER
+                  message: "<script>removeUsernameCookie();location.href+='';</script>"
+                }
 
-              break
-      ]
+                break
+        ]
 
-    else
-      tasks.push noperms
+      else
+        tasks.push noperms
 
 
   return tasks
