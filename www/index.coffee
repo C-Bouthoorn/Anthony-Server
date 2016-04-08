@@ -7,6 +7,21 @@ socket = null
 sessionid = null
 channels = []
 
+emojis = {
+  ':)': "http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg"
+  ':unicorn:': "http://emojione.com/wp-content/uploads/assets/emojis/1f984.svg"
+}
+
+for name in [
+  '20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'derp', 'eyeroll', 'fabulous',
+  'facehoof', 'greed', 'hero', 'laugh', 'lie', 'lyraexcited', 'lyrasad', 'NM2', 'NM3', 'notamused', 'photofinish',
+  'ppsmile', 'pwink', 'RDhuh', 'rdsmile', 'rdwink', 'scared', 'science', 'seriousTS', 'shiny', 'shrug',
+  'somethingwentwrong', 'spikemov', 'spike', 'squee', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile',
+  'twiblush', 'umad', 'vinyl', 'XTUXSmiley', 'yay', 'YEAH'
+]
+
+  emojis[":#{name}:"] = "/images/emoji/#{name}.png"
+
 
 setUsernameCookie = (username) ->
   if Cookies is undefined
@@ -73,21 +88,6 @@ escapeRegex = (str) ->
 
 
 parseMessage = (html) ->
-  emojis = {
-    ':)': "http://emojione.com/wp-content/uploads/assets/emojis/1f603.svg"
-    ':unicorn:': "http://emojione.com/wp-content/uploads/assets/emojis/1f984.svg"
-  }
-
-  for name in [
-    '20%sadder', 'adrianyouhappynow', 'AJscared', 'bigmac', 'cadance', 'colgatehappy', 'derp', 'eyeroll', 'fabulous',
-    'facehoof', 'greed', 'hero', 'laugh', 'lie', 'lyraexcited', 'lyrasad', 'NM2', 'NM3', 'notamused', 'photofinish',
-    'ppsmile', 'pwink', 'RDhuh', 'rdsmile', 'rdwink', 'scared', 'science', 'seriousTS', 'shiny', 'shrug',
-    'somethingwentwrong', 'spikemov', 'spike', 'squee', 'sweetie', 'thisisabrushie', 'thorg', 'trixie', 'tssmile',
-    'twiblush', 'umad', 'vinyl', 'XTUXSmiley', 'yay', 'YEAH'
-  ]
-
-    emojis[":#{name}:"] = "/images/#{name}.png"
-
   for emoji of emojis
     link = emojis[emoji]
 
