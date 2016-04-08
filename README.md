@@ -6,11 +6,10 @@ A server for Anthony
 
   Run `./install.sh`
 
-## HOW TO RUN SERVER
+## HOW TO BUILD & RUN SERVER
 
-  1. Run `./build.sh`
-  2. Run `coffee server.coffee`
+  Run `npm start`
 
-## HOW TO BUILD
+## HOW TO BUILD MANUALLY
 
   Run `./build.sh`
