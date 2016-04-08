@@ -24,7 +24,7 @@ doCommands = function(message, user, socket) {
         var color;
         var color;
         color = args[0];
-        return console.log("Set fur color " + color + " for " + user.name);
+        return console.log("[PONY_CMD]".black.bgCyan + (" Set fur color " + color + " for user " + user.name));
       }
     ]);
   } else if (command === '/mane') {
@@ -33,7 +33,7 @@ doCommands = function(message, user, socket) {
         var color;
         var color;
         color = args[0];
-        return console.log("Set mane color " + color + " for " + user.name);
+        return console.log("[PONY_CMD]".black.bgCyan + (" Set mane color " + color + " for user " + user.name));
       }
     ]);
   } else if (command === '/tailstyle') {
@@ -42,7 +42,7 @@ doCommands = function(message, user, socket) {
         var style;
         var style;
         style = args[0];
-        return console.log("Set tail style " + style + " for " + user.name);
+        return console.log("[PONY_CMD]".black.bgCyan + (" Set tail style " + style + " for user " + user.name));
       }
     ]);
   } else if (command === '/manestyle') {
@@ -51,7 +51,7 @@ doCommands = function(message, user, socket) {
         var style;
         var style;
         style = args[0];
-        return console.log("Set mane style " + style + " for " + user.name);
+        return console.log("[PONY_CMD]".black.bgCyan + (" Set mane style " + style + " for user " + user.name));
       }
     ]);
   } else if (command === '/fullstyle') {
@@ -60,25 +60,25 @@ doCommands = function(message, user, socket) {
         var style;
         var style;
         style = args[0];
-        return console.log("Set style " + style + " for " + user.name);
+        return console.log("[PONY_CMD]".black.bgCyan + (" Set style " + style + " for user " + user.name));
       }
     ]);
   } else if (command === '/spawn') {
     tasks.push([
       [util.inspect(args)], function(args) {
-        return console.log("Spawn " + user.name);
+        return console.log("[PONY_CMD]".black.bgCyan + (" User " + user.name + " teleported to spawn"));
       }
     ]);
   } else if (command === '/sethome') {
     tasks.push([
       [util.inspect(args)], function(args) {
-        return console.log("Set home for " + user.name);
+        return console.log("[PONY_CMD]".black.bgCyan + (" Set home for user " + user.name));
       }
     ]);
   } else if (command === '/home') {
     tasks.push([
       [util.inspect(args)], function(args) {
-        return console.log("Teleport to home for " + user.name);
+        return console.log("[PONY_CMD]".black.bgCyan + (" User " + user.name + " teleported to home"));
       }
     ]);
   } else if (command === '/teleport') {
@@ -87,16 +87,7 @@ doCommands = function(message, user, socket) {
         var name;
         var name;
         name = args[0];
-        return console.log("Teleport " + user.name + " to " + name);
-      }
-    ]);
-  } else if (command === '/tag') {
-    tasks.push([
-      [util.inspect(args)], function(args) {
-        var tag;
-        var tag;
-        tag = args[0];
-        return console.log("Let " + user.name + " join " + tag);
+        return console.log("[PONY_CMD]".black.bgCyan + (" User " + user.name + " teleported to " + name));
       }
     ]);
   } else if (command === '/create') {
@@ -105,40 +96,46 @@ doCommands = function(message, user, socket) {
         var name;
         var name, qq, regex;
         name = args[0];
-        regex = /^[a-zA-Z0-9_]{2,}$/;
+        regex = /^[a-zA-Z0-9_]{2,64}$/;
         if (!regex.test(name)) {
-          console.log("[  CHNL  ] Channel doesn't match requirements");
+          console.log("[  CHNL  ]".black.bgRed + " Channel doesn't match requirements");
           socket.emit('client-receive-message', {
             user: SERVER_USER,
             message: "Channel name doesn't match requirements"
           });
           return;
         }
-        console.log("[  CHNL  ] Create channel " + name + " for " + user.name);
+        console.log("[  CHNL  ]".black.bgGreen + (" Create channel " + name + " for user " + user.name));
         if (channels.includes(name)) {
-          console.log("[  CHNL  ] Channel already exists!");
+          console.log("[  CHNL  ]".black.bgRed + " Channel already exists!");
           socket.emit('client-receive-message', {
             user: SERVER_USER,
-            message: "Channel already exists! Use <code>/join " + name + "</code> to join it"
+            message: "Channel already exists! Use <b>/join " + name + "</b> to join it"
           });
           return;
         }
         channels.push(name);
-        console.log("[  CHNL  ] Channel created");
         user.channel_perms.push(name);
-        qq = "UPDATE users SET channel_perms=" + (db.escape(user.channel_perms.join(';'))) + " WHERE id=" + user.id + ";";
         if (db === void 0) {
-          console.log("[  CHNL  ] DATABASE UNDEFINED!");
+          console.log("[  CHNL  ]".black.bgRed + " DATABASE UNDEFINED!");
           return;
         }
-        return db.query(qq, function(err, data) {
+        qq = "UPDATE " + USER_TABLE + " SET channel_perms=" + (db.escape(user.channel_perms.join(';'))) + " WHERE id=" + user.id + ";";
+        db.query(qq, function(err, data) {
           if (err) {
             throw err;
           }
-          return socket.emit('client-receive-message', {
-            user: SERVER_USER,
-            message: "Channel created. Use <code>/join " + name + "</code> to join it"
-          });
+        });
+        qq = "INSERT INTO " + CHANNELS_TABLE + " (name) VALUES (" + (db.escape(name)) + ");";
+        db.query(qq, function(err, data) {
+          if (err) {
+            throw err;
+          }
+        });
+        console.log("[  CHNL  ]".black.bgGreen + (" Channel " + name + " created"));
+        return socket.emit('client-receive-message', {
+          user: SERVER_USER,
+          message: "Channel created. Use <b>/join " + name + "</b> to join it"
         });
       }
     ]);
@@ -148,9 +145,8 @@ doCommands = function(message, user, socket) {
         var name;
         var name;
         name = args[0];
-        console.log("[  CHNL  ] Let " + user.name + " join channel " + name);
         if (!user.channel_perms.split(';').includes(name)) {
-          console.log("[  CHNL  ] User doesn't have permission to join this channel!");
+          console.log("[  CHNL  ]".black.bgRed + (" User " + user.name + " doesn't have permission to join channel " + name + "!"));
           socket.emit('client-receive-message', {
             user: SERVER_USER,
             message: "You don't have permission to join this channel"
@@ -158,7 +154,7 @@ doCommands = function(message, user, socket) {
           return;
         }
         if (!channels.includes(name)) {
-          console.log("[  CHNL  ] Channel doesn't exist!");
+          console.log("[  CHNL  ]".black.bgRed + (" Channel " + name + " doesn't exist!"));
           socket.emit('client-receive-message', {
             user: SERVER_USER,
             message: "That channel doesn't exist"
@@ -166,7 +162,7 @@ doCommands = function(message, user, socket) {
           return;
         }
         user.channels.push(name);
-        console.log("[  CHNL  ] Joined!");
+        console.log("[  CHNL  ]".black.bgGreen + (" User " + user.name + " joined channel " + name));
         socket.emit('client-receive-message', {
           user: SERVER_USER,
           message: "Joined channel"
@@ -176,18 +172,27 @@ doCommands = function(message, user, socket) {
         });
       }
     ]);
+  } else if (command === '/invite') {
+    tasks.push([
+      [util.inspect(args)], function(args) {
+        var username, name;
+        var name, username;
+        username = args[0];
+        return name = args[1];
+      }
+    ]);
   } else if (command === '/leave') {
     tasks.push([
       [util.inspect(args)], function(args) {
         var name;
         var name;
         name = args[0];
-        console.log("Let " + user.name + " leave channel " + name);
+        console.log("[  CHNL  ]".black.bgRed + ("user " + user.name + " left channel " + name));
         if (!user.channels.includes(name)) {
-          console.log("User hasn't joined channel!");
+          console.log("[  CHNL  ]".black.bgRed + ("User " + user.name + " isn't in channel " + name + "!"));
           socket.emit('client-receive-message', {
             user: SERVER_USER,
-            message: "You haven't joined that channel"
+            message: "You aren't in that channel"
           });
           return;
         }
@@ -201,6 +206,15 @@ doCommands = function(message, user, socket) {
         });
       }
     ]);
+  } else if (command === '/tag') {
+    tasks.push([
+      [util.inspect(args)], function(args) {
+        var tag;
+        var tag;
+        tag = args[0];
+        return console.log("[MINIGAME]".black.bgMagenta + ("user " + user.name + " joined the tag!"));
+      }
+    ]);
   } else if (command === '/report') {
     tasks.push([
       [util.inspect(args)], function(args) {
@@ -208,10 +222,10 @@ doCommands = function(message, user, socket) {
         var name, reason;
         name = args[0];
         reason = args.splice(1).join(' ');
-        console.log("[ REPORT ] " + user.name + " reported " + name + " for '" + reason + "'");
+        console.log("[ REPORT ]".red.bgWhite + (" User " + user.name + " reported " + name + " for ") + ("" + reason).underline);
         return socket.emit('client-receive-message', {
           user: SERVER_USER,
-          message: "Thanks for reporting that user! We will look into it"
+          message: "Thank you for reporting! We will look into it. Note, however, that false reports might result in a ban!"
         });
       }
     ]);
@@ -286,7 +300,7 @@ doCommands = function(message, user, socket) {
               targetsock = ses.socket;
               targetsock.emit('client-receive-message', {
                 user: SERVER_USER,
-                message: "<script>location.href+='';</script>"
+                message: "<script>removeUsernameCookie();location.href+='';</script>"
               });
               break;
             } else {

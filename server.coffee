@@ -14,7 +14,13 @@ htmlencode = require('htmlencode')
 salthash   = require('password-hash-and-salt')
 
 # Console timestamps
-require( "console-stamp" )( console, { pattern : "yyyy-mm-dd'T'HH:MM:ss", label : false, colors: { stamp: ["yellow", "bold"] } } )
+require( "console-stamp" )( console, {
+  pattern: "dd/mm/yyyy' 'HH:MM:ss.l"
+  label: false
+  colors: {
+    stamp: ["yellow", "bold"]
+  }
+})
 
 # Array includes
 require('./includes.js')
@@ -176,8 +182,21 @@ parseMessage = (x) ->
 
   for match in matches
 
-    link = linkregex.exec(match)[1]
-    base = baseregex.exec(link)[2]
+    link = linkregex.exec(match)
+
+    if link is null
+      # Invalid url
+      continue
+
+    link = link[1]
+
+    base = baseregex.exec(link)
+
+    if base is null
+      # Invalid url
+      continue
+
+    base = base[2]
 
     x = "<a href='#{link}' target='_blank'>#{base}</a>"
 
