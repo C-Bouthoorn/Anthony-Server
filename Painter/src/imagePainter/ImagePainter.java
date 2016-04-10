@@ -42,8 +42,14 @@ public class ImagePainter {
 		String hex = Integer.toHexString(newColor.getRGB() & 0xffffff);
 		while ( hex.length() < 6 ) hex = "00"+hex;
 		
-		String newFilename = file.getAbsoluteFile().getParent() + "/converted/" + base + "-" + hex + "." + ext;
+		String newFilename = file.getAbsoluteFile().getParent() + File.separator + "converted" + File.separator + base + "-" + hex + "." + ext;
 		File newFile = new File(newFilename);
+		
+		// Create "converted" folder if it doesn't exist
+		File convdir = new File(newFile.getParent());
+		if(! convdir.exists()) {
+			convdir.mkdirs();
+		}
 		
 		System.out.println(newFilename);
 		
