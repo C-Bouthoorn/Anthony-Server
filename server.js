@@ -406,7 +406,7 @@ io.sockets.on('connection', function(socket) {
       return;
     }
     return (function(data) {
-      var password, qq, regex, username;
+      var password, qq, regex, ses, username;
       username = data.username;
       password = data.password;
       if (username === void 0 || password === void 0) {
@@ -425,6 +425,21 @@ io.sockets.on('connection', function(socket) {
         return;
       }
       console.log("[ LOG-IN ]".c_INFO + (" " + ip + " : Login request for user '" + username + "'"));
+      if (((function() {
+        var i, len, results;
+        results = [];
+        for (i = 0, len = sessions.length; i < len; i++) {
+          ses = sessions[i];
+          results.push(ses.user.name);
+        }
+        return results;
+      })()).includes(user.name)) {
+        console.log("[ LOG-IN ]".c_ERR + " User already logged in");
+        socket.emit('login-failed', {
+          error: "You are already logged in!"
+        });
+        return;
+      }
       if (db === void 0) {
         console.log("[ LOG-IN ]".c_ERR + " DATABASE UNDEFINED!");
         socket.emit('login-failed', {

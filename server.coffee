@@ -515,6 +515,16 @@ io.sockets.on 'connection', (socket) ->
       console.log "[ LOG-IN ]".c_INFO + " #{ip} : Login request for user '#{username}'"
 
 
+      # Check if user is already logged in
+      if (ses.user.name for ses in sessions).includes user.name
+        console.log "[ LOG-IN ]".c_ERR + " User already logged in"
+
+        socket.emit 'login-failed', {
+          error: "You are already logged in!"
+        }
+        return
+
+
       if db is undefined
         console.log "[ LOG-IN ]".c_ERR + " DATABASE UNDEFINED!"
 
