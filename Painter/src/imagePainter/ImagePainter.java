@@ -68,12 +68,14 @@ public class ImagePainter {
 					
 					if ( r > 127 && g < r && b < r ) {  // That's kinda red'ish, right?
 						
-						// Convert color to match newColor
-						r = (int) Math.round( r/255.0 * newColor.getRed()   );
-						g = (int) Math.round( r/255.0 * newColor.getGreen() );
-						b = (int) Math.round( r/255.0 * newColor.getBlue()  );
+						int _r = r;
 						
-						c = new Color(r, g, b, newColor.getAlpha());
+						// Convert color to match newColor
+						r = (int) ( _r/255.0 * newColor.getRed()   );
+						g = (int) ( _r/255.0 * newColor.getGreen() );
+						b = (int) ( _r/255.0 * newColor.getBlue()  );
+						
+						c = new Color(r, g, b, c.getAlpha());
 					}
 					
 					image.setRGB(x, y, c.getRGB());
