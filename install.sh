@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get install nodejs npm ruby gem
+sudo apt-get install nodejs npm ruby gem curl
 
 chmod +x ./setupnode.sh
 ./setupnode.sh
