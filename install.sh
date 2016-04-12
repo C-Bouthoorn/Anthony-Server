@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get install nodejs npm ruby gem
+sudo apt-get install -y nodejs npm ruby gem curl mysql-client mysql-server
 
 chmod +x ./setupnode.sh
 ./setupnode.sh
