@@ -9,3 +9,5 @@ sudo npm install -g coffee-script
 sudo gem install sass
 
 sudo npm install
+
+./setupmysql.sh
