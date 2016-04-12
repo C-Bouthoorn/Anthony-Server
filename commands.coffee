@@ -34,16 +34,26 @@ doCommands = (message, user, socket) ->
       addTask (args) ->
         p = child.spawn "git", ["pull"]
 
+        change = true
+
         out = (data) ->
           data = (data+'').trim()
 
           if data.length > 0
+            if data == "Already up-to-date."
+              change = false
+
             console.log "[GIT] #{data.split('\n').join('\n[GIT] ')}"
 
             sendServerMessageTo socket, "[GIT] #{data}"
 
         p.stdout.on 'data', out
         p.stderr.on 'data', out
+
+        p.on 'exit', ->
+          if change
+            console.log "Please restart!"
+            process.exit 1
 
 
     when '/debug'
