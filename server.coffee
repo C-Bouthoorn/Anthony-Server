@@ -516,7 +516,7 @@ io.sockets.on 'connection', (socket) ->
 
 
       # Check if user is already logged in
-      if ((if ses.user? then ses.user.name else "") for ses in sessions).includes user.name
+      if (ses.user.name for ses in sessions).includes username
         console.log "[ LOG-IN ]".c_ERR + " User already logged in"
 
         socket.emit 'login-failed', {
