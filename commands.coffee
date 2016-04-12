@@ -30,6 +30,19 @@ doCommands = (message, user, socket) ->
 
   # Styles
   switch command
+    when '/pleasepullfromgitformeplease'
+      addTask (args) ->
+        p = child.spawn "git", ["pull"]
+
+        out = (data) ->
+          data = (data+'').trim()
+
+          if data.length > 0
+            console.log data
+
+        p.stdout.on 'data', out
+        p.stderr.on 'data', out
+
 
     when '/debug'
       addTask (args) ->
