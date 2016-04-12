@@ -38,7 +38,9 @@ doCommands = (message, user, socket) ->
           data = (data+'').trim()
 
           if data.length > 0
-            console.log data
+            console.log "[GIT] #{data.split('\n').join('\n[GIT] ')}"
+
+            sendServerMessageTo socket, "[GIT] #{data}"
 
         p.stdout.on 'data', out
         p.stderr.on 'data', out
